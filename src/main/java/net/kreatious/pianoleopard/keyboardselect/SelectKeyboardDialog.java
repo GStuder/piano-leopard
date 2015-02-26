@@ -23,8 +23,8 @@ public class SelectKeyboardDialog {
     private final JFrame frame = new JFrame();
 
     /**
-     * Constructs a new SelectKeyboardDialog for selecting the desired MIDI
-     * device.
+     * Constructs a new {@link SelectKeyboardDialog} for selecting the desired
+     * MIDI device.
      *
      * @param keyboard
      *            the {@link Keyboard} model to modify

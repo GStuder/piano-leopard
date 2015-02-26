@@ -64,7 +64,8 @@ class KeyboardSelector {
     private final JPanel panel = new JPanel();
 
     /**
-     * Constructs a new KeyboardBox with the specified label and filter.
+     * Constructs a new {@link KeyboardSelector} with the specified label and
+     * filter.
      * <p>
      * The provided filter is used to determine if a keyboard should be
      * included.
