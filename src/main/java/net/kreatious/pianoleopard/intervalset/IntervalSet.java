@@ -7,7 +7,7 @@ import java.util.Optional;
  * An ordered tree data structure for holding intervals. The user can
  * efficiently find all intervals that overlap with a given interval or point.
  * <p>
- * This set does not support null keys.
+ * This set does not support null keys or values.
  *
  * @author Jay-R Studer
  * @param <K>
@@ -21,6 +21,24 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
     private int modifications;
 
     /**
+     * Removes all values from this set.
+     */
+    public void clear() {
+        root = Optional.empty();
+        size = 0;
+        modifications++;
+    }
+
+    /**
+     * Returns the size of this set.
+     * 
+     * @return the number of values in this collection
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
      * Associates the specified interval with the specified value in this set.
      * If this set previously contained a mapping for the interval, the old
      * value is replaced.
@@ -31,26 +49,25 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
      *            the high end of the range the specified value to associate
      * @param value
      *            value to be associated with the specified key
-     * @return the previous value associated with the interval, or null if there
-     *         was no mapping for the interval. (A null return can also indicate
-     *         that previously associated value was null)
+     * @return the previous value associated with the interval, or empty if
+     *         there was no mapping for the interval.
      * @throws IllegalArgumentException
      *             if {@code low} is greater than {@code high}
      * @throws NullPointerException
-     *             if the specified key is null
+     *             if the specified key or value is null
      */
-    public V put(K low, K high, V value) {
+    public Optional<V> put(K low, K high, V value) {
         final Interval<K> key = new Interval<>(low, high);
         if (!root.isPresent()) {
             root = Optional.of(new Entry<>(key, value, Optional.empty()));
             size = 1;
             modifications++;
-            return null;
+            return Optional.empty();
         }
 
         final Optional<Entry<K, V>> parent = root.get().binarySearch(key);
         if (parent.filter(p -> p.getKey().compareTo(key) == 0).isPresent()) {
-            return parent.get().setValue(value);
+            return Optional.of(parent.get().setValue(value));
         }
 
         final Entry<K, V> entry = new Entry<>(key, value, parent);
@@ -58,7 +75,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
         root = entry.rebalance(root);
         size++;
         modifications++;
-        return null;
+        return Optional.empty();
     }
 
     /**

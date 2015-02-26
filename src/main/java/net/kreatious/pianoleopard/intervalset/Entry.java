@@ -2,6 +2,7 @@ package net.kreatious.pianoleopard.intervalset;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -17,6 +18,7 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
     private boolean red;
 
     Entry(Interval<K> key, V value, Optional<Entry<K, V>> parent) {
+        Objects.requireNonNull(value);
         this.key = key;
         this.value = value;
         this.parent = parent;
@@ -218,6 +220,7 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
 
     @Override
     public V setValue(V value) {
+        Objects.requireNonNull(value);
         final V result = this.value;
         this.value = value;
         return result;
