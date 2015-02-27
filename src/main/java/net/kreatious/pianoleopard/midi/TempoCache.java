@@ -20,11 +20,13 @@ import javax.sound.midi.Sequence;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * Maps from MIDI ticks to microseconds
+ * Maps from MIDI ticks to microseconds.
+ * <p>
+ * This class is intended to be used only by this package and its subpackages.
  *
  * @author Jay-R Studer
  */
-class TempoCache {
+public class TempoCache {
     private final int resolution;
 
     private final NavigableMap<Long, Integer> tempos;
@@ -98,7 +100,7 @@ class TempoCache {
      *            the MIDI ticks to convert into microseconds
      * @return the corresponding number of microseconds
      */
-    long ticksToMicroseconds(long ticks) {
+    public long ticksToMicroseconds(long ticks) {
         final long previousEventTick = microseconds.floorKey(ticks);
         final long elapsedMicroseconds = microseconds.get(previousEventTick);
         final int currentTempo = tempos.floorEntry(ticks).getValue();
