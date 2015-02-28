@@ -46,5 +46,5 @@ abstract class TrackVisitor {
      * @param pair
      *            a completed event pair
      */
-    protected abstract void visitEventPair(EventPair<Event> pair);
+    protected abstract void visitEventPair(EventPair<? extends Event> pair);
 }

@@ -14,6 +14,42 @@ public class NoteEvent extends Event {
     private final boolean on;
     private transient Slot slot;
 
+    /**
+     * Array of flags indicating if a raw MIDI key (note) modulus 12 is sharp or
+     * not.
+     * <p>
+     * The first element corresponds to C, second is C#, third is D, etc.
+     */
+    private static final boolean[] SHARP_KEYS = { false, true, false, true, false, false, true, false, true, false,
+            true, false };
+
+    /**
+     * Constructs a new {@link NoteEvent} with the specified data.
+     * <p>
+     * The channel will be 0 and velocity will be 127.
+     *
+     * @param key
+     *            the raw MIDI key (note) for this event, between 0 and 127
+     *            inclusive
+     * @param on
+     *            {@code true} if this event is a note on event, otherwise
+     *            {@code false}
+     * @param time
+     *            the time that this event occurs, in microseconds
+     */
+    public NoteEvent(int key, boolean on, long time) {
+        super(0, time);
+
+        if (key < 0 || key > 127) {
+            throw new IllegalArgumentException("Key " + key + " is out of range [0, 127]");
+        }
+
+        this.key = key;
+        this.on = on;
+        velocity = 127;
+        slot = new Slot(getChannel(), key);
+    }
+
     NoteEvent(ShortMessage message, long time) {
         super(message, time);
 
@@ -56,6 +92,16 @@ public class NoteEvent extends Event {
      */
     public int getVelocity() {
         return velocity;
+    }
+
+    /**
+     * Returns if this note is considered sharp or not.
+     *
+     * @return {@code true} if this note event is a sharp note, {@code false}
+     *         otherwise.
+     */
+    public boolean isSharp() {
+        return SHARP_KEYS[key % 12];
     }
 
     @Override

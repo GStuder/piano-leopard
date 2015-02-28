@@ -13,6 +13,23 @@ public abstract class Event {
     private final int channel;
 
     /**
+     * Constructs a new {@link Event} using the specified channel.
+     *
+     * @param channel
+     *            the MIDI channel for this event between 0 and 15 inclusive.
+     * @param time
+     *            the time in microseconds when the message occurs.
+     */
+    Event(int channel, long time) {
+        if (channel < 0 || channel > 15) {
+            throw new IllegalArgumentException(channel + " is outside of the valid range [0, 15]");
+        }
+
+        this.channel = channel;
+        this.time = time;
+    }
+
+    /**
      * Constructs a new {@link Event} using the specified {@link ShortMessage}.
      *
      * @param message
