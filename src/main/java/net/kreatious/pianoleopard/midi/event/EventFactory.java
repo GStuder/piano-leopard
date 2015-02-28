@@ -14,6 +14,12 @@ import net.kreatious.pianoleopard.midi.TempoCache;
  */
 public class EventFactory {
     /**
+     * Private constructor to prevent instantiation by external consumers
+     */
+    private EventFactory() {
+    }
+
+    /**
      * Constructs a new immutable subclass of {@link Event} with the appropriate
      * information.
      *
