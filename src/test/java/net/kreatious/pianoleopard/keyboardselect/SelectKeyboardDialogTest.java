@@ -2,11 +2,6 @@ package net.kreatious.pianoleopard.keyboardselect;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -26,8 +21,6 @@ import org.junit.Test;
  * @author Jay-R Studer
  */
 public class SelectKeyboardDialogTest {
-    private final Keyboard keyboard = mock(Keyboard.class);
-
     private final Devices devices = new Devices();
     private final MidiDevice transmitter = devices.addUnlimitedTransmitter("transmitter");
     private final MidiDevice receiver = devices.addUnlimitedReceiver("receiver");
@@ -40,9 +33,7 @@ public class SelectKeyboardDialogTest {
      * devices set.
      */
     public SelectKeyboardDialogTest() {
-        given(keyboard.getInput()).willReturn(defaultTransmitter);
-        given(keyboard.getOutput()).willReturn(defaultReceiver);
-        dialog = new SelectKeyboardDialog(keyboard, devices);
+        dialog = new SelectKeyboardDialog(new Keyboard(defaultTransmitter, defaultReceiver), devices);
     }
 
     /**
@@ -54,8 +45,9 @@ public class SelectKeyboardDialogTest {
         getComboBoxWithDevice(receiver).setSelectedItem(new DeviceRow(receiver));
         getButtonWithText("OK").doClick();
 
-        verify(keyboard).setInput(transmitter);
-        verify(keyboard).setOutput(receiver);
+        final Keyboard keyboard = dialog.getKeyboard();
+        assertThat(keyboard.getInput(), is(transmitter));
+        assertThat(keyboard.getOutput(), is(receiver));
         assertThat(dialog.getFrame().isValid(), is(false));
     }
 
@@ -66,8 +58,9 @@ public class SelectKeyboardDialogTest {
     public void testOKNoSelection() {
         getButtonWithText("OK").doClick();
 
-        verify(keyboard).setInput(defaultTransmitter);
-        verify(keyboard).setOutput(defaultReceiver);
+        final Keyboard keyboard = dialog.getKeyboard();
+        assertThat(keyboard.getInput(), is(defaultTransmitter));
+        assertThat(keyboard.getOutput(), is(defaultReceiver));
         assertThat(dialog.getFrame().isValid(), is(false));
     }
 
@@ -80,8 +73,9 @@ public class SelectKeyboardDialogTest {
         getComboBoxWithDevice(receiver).setSelectedItem(new DeviceRow(receiver));
         getButtonWithText("Cancel").doClick();
 
-        verify(keyboard, never()).setInput(any(MidiDevice.class));
-        verify(keyboard, never()).setOutput(any(MidiDevice.class));
+        final Keyboard keyboard = dialog.getKeyboard();
+        assertThat(keyboard.getInput(), is(defaultTransmitter));
+        assertThat(keyboard.getOutput(), is(defaultReceiver));
         assertThat(dialog.getFrame().isValid(), is(false));
     }
 

@@ -1,7 +1,5 @@
 package net.kreatious.pianoleopard.keyboardselect;
 
-import java.util.Objects;
-
 import javax.sound.midi.MidiDevice;
 
 /**
@@ -10,24 +8,20 @@ import javax.sound.midi.MidiDevice;
  * @author Jay-R Studer
  */
 public class Keyboard {
-    private MidiDevice input;
-    private MidiDevice output;
+    private final MidiDevice input;
+    private final MidiDevice output;
 
     /**
+     * Constructs a new {@link Keyboard} with the specified input and output
+     * devices
+     *
      * @param input
-     *            the {@link MidiDevice} to set as the input
-     */
-    void setInput(MidiDevice input) {
-        Objects.requireNonNull(input);
-        this.input = input;
-    }
-
-    /**
+     *            the MIDI input device
      * @param output
-     *            the {@link MidiDevice} to set as the output
+     *            the MIDI output device
      */
-    void setOutput(MidiDevice output) {
-        Objects.requireNonNull(output);
+    public Keyboard(MidiDevice input, MidiDevice output) {
+        this.input = input;
         this.output = output;
     }
 
@@ -47,5 +41,10 @@ public class Keyboard {
      */
     public MidiDevice getOutput() {
         return output;
+    }
+
+    @Override
+    public String toString() {
+        return "Keyboard[input = " + input.getDeviceInfo() + ", output = " + output.getDeviceInfo() + "]";
     }
 }
