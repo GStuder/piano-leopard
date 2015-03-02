@@ -80,7 +80,7 @@ public class SelectKeyboardDialog {
      * @return the {@link JDialog} associated with this dialog
      */
     @VisibleForTesting
-    JDialog getFrame() {
+    public JDialog getDialog() {
         return dialog;
     }
 

@@ -48,7 +48,7 @@ public class SelectKeyboardDialogTest {
         final Keyboard keyboard = dialog.getKeyboard();
         assertThat(keyboard.getInput(), is(transmitter));
         assertThat(keyboard.getOutput(), is(receiver));
-        assertThat(dialog.getFrame().isValid(), is(false));
+        assertThat(dialog.getDialog().isValid(), is(false));
     }
 
     /**
@@ -61,7 +61,7 @@ public class SelectKeyboardDialogTest {
         final Keyboard keyboard = dialog.getKeyboard();
         assertThat(keyboard.getInput(), is(defaultTransmitter));
         assertThat(keyboard.getOutput(), is(defaultReceiver));
-        assertThat(dialog.getFrame().isValid(), is(false));
+        assertThat(dialog.getDialog().isValid(), is(false));
     }
 
     /**
@@ -76,17 +76,17 @@ public class SelectKeyboardDialogTest {
         final Keyboard keyboard = dialog.getKeyboard();
         assertThat(keyboard.getInput(), is(defaultTransmitter));
         assertThat(keyboard.getOutput(), is(defaultReceiver));
-        assertThat(dialog.getFrame().isValid(), is(false));
+        assertThat(dialog.getDialog().isValid(), is(false));
     }
 
     private JButton getButtonWithText(String text) {
-        return Stream.of(dialog.getFrame().getContentPane().getComponents())
+        return Stream.of(dialog.getDialog().getContentPane().getComponents())
                 .filter(component -> component instanceof JButton).map(component -> (JButton) component)
                 .filter(button -> button.getText().equals(text)).findFirst().get();
     }
 
     private JComboBox<?> getComboBoxWithDevice(MidiDevice device) {
-        return Stream.of(dialog.getFrame().getContentPane().getComponents())
+        return Stream.of(dialog.getDialog().getContentPane().getComponents())
                 .filter(component -> component instanceof JPanel).map(component -> (JPanel) component)
                 .flatMap(panel -> Stream.of(panel.getComponents()))
                 .filter(component -> component instanceof JComboBox<?>).map(component -> (JComboBox<?>) component)
