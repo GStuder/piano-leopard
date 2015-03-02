@@ -17,8 +17,10 @@ import javax.sound.midi.Track;
  */
 public class ParsedSequence {
     private final List<ParsedTrack> parsedTracks;
+    private final Sequence sequence;
 
-    private ParsedSequence(Track[] tracks, TempoCache cache) {
+    private ParsedSequence(Sequence sequence, Track[] tracks, TempoCache cache) {
+        this.sequence = sequence;
         parsedTracks = Collections.unmodifiableList(Stream.of(tracks).map(track -> new ParsedTrack(track, cache))
                 .collect(toList()));
     }
@@ -33,13 +35,23 @@ public class ParsedSequence {
     }
 
     /**
+     * Gets the original MIDI sequence used to create this parsed MIDI sequence.
+     *
+     * @return the original MIDI {@link Sequence}
+     */
+    public Sequence getSequence() {
+        return sequence;
+    }
+
+    /**
      * Returns an empty parsed sequence containing nothing.
-     * 
+     *
      * @return a new empty {@link ParsedSequence}
      */
     public static ParsedSequence createEmpty() {
         try {
-            return new ParsedSequence(new Track[0], new TempoCache(new Sequence(Sequence.SMPTE_25, 1)));
+            final Sequence sequence = new Sequence(Sequence.SMPTE_25, 1);
+            return new ParsedSequence(sequence, new Track[0], new TempoCache(sequence));
         } catch (final InvalidMidiDataException e) {
             throw new IllegalStateException(e);
         }
@@ -53,6 +65,6 @@ public class ParsedSequence {
      * @return a new {@link ParsedSequence}
      */
     public static ParsedSequence parseByTracks(Sequence sequence) {
-        return new ParsedSequence(sequence.getTracks(), new TempoCache(sequence));
+        return new ParsedSequence(sequence, sequence.getTracks(), new TempoCache(sequence));
     }
 }
