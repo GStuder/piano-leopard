@@ -17,6 +17,7 @@ import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Transmitter;
 
 import net.kreatious.pianoleopard.midi.ParsedSequence;
@@ -164,5 +165,22 @@ public class OutputModelTest {
         verify(currentTimeListener, timeout(120).atLeast(2)).accept(anyLong());
 
         outputModel.close();
+    }
+
+    /**
+     * Tests for {@link OutputModel#sendMessage}
+     *
+     * @throws MidiUnavailableException
+     *             exception is never thrown from this test
+     * @throws InvalidMidiDataException
+     *             exception is never thrown from this test
+     */
+    @Test
+    public void testSendMessage() throws MidiUnavailableException, InvalidMidiDataException {
+        final ShortMessage message = new ShortMessage(ShortMessage.SYSTEM_RESET);
+        outputModel.setOutputDevice(output);
+        outputModel.sendMessage(message);
+
+        verify(output.getReceiver()).send(message, -1);
     }
 }

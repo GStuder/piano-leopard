@@ -14,6 +14,7 @@ import java.util.function.LongConsumer;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
@@ -120,6 +121,7 @@ public class OutputModel implements AutoCloseable {
             sequence = ParsedSequence.parseByTracks(MidiSystem.getSequence(midiStream));
             sequencer.stop();
             sequencer.setSequence(sequence.getSequence());
+            sequencer.setMicrosecondPosition(0);
             receiver.ifPresent(OutputModel::resetReceiver);
             openListeners.forEach(listener -> listener.accept(sequence));
         } catch (final InvalidMidiDataException e) {
@@ -128,7 +130,7 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
-     * Adds a listener to notify when a MIDI file is opened.
+     * Adds a listener to notify when a MIDI file is opened and has been parsed.
      *
      * @param listener
      *            the listener to add
@@ -152,13 +154,24 @@ public class OutputModel implements AutoCloseable {
         currentTimeListeners.add(listener);
     }
 
+    /**
+     * Sends a MIDI message to the output.
+     *
+     * @param message
+     *            the MIDI message to send to the connected output device
+     */
+    public void sendMessage(MidiMessage message) {
+        receiver.ifPresent(receive -> receive.send(message, -1));
+    }
+
     @Override
     public void close() throws InterruptedException {
+        tickThread.interrupt();
+        tickThread.join();
+
         sequencer.close();
         receiver.ifPresent(OutputModel::resetReceiver);
         output.ifPresent(MidiDevice::close);
-        tickThread.interrupt();
-        tickThread.join();
     }
 
     private static void resetReceiver(Receiver receiver) {
