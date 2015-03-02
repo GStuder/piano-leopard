@@ -15,7 +15,7 @@ import net.kreatious.pianoleopard.midi.event.NoteEvent;
  * @author Jay-R Studer
  */
 class ActiveNoteStyleStrategy implements StyleStrategy<NoteEvent> {
-    private static final Stroke STROKE = new BasicStroke(2.0f);
+    private static final Stroke STROKE = new BasicStroke(1.0f);
 
     @Override
     public void paint(Graphics2D graphics, EventPair<NoteEvent> event, Rectangle rect) {

@@ -43,6 +43,6 @@ class ActivePedalStyleStrategy implements StyleStrategy<PedalEvent> {
     }
 
     private static Color transparent(Color color) {
-        return new Color(color.getRGB() & 0x30FFFFFF);
+        return new Color(color.getRGB() & 0x30FFFFFF, true);
     }
 }
