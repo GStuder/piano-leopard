@@ -1,18 +1,14 @@
 package net.kreatious.pianoleopard.painter;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.BufferStrategy;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 
 import net.kreatious.pianoleopard.midi.ParsedSequence;
-
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Renders the currently playing sequence into a panel using double buffering.
@@ -20,67 +16,30 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Jay-R Studer
  */
 public class PainterPanel {
-    private final JPanel panel = new JPanel();
-    private final Canvas canvas;
-    private final Thread painterThread;
+    private final class PainterPanelImpl extends JPanel {
+        private static final long serialVersionUID = 3647951920113354307L;
+        final Painter painter = new Painter(new Dimension());
+
+        PainterPanelImpl() {
+            setPreferredSize(new Dimension(800, 400));
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    painter.setComponentDimensions(getSize());
+                }
+            });
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            painter.paint((Graphics2D) g, currentTime, sequence);
+        }
+    }
+
+    private final JPanel panel = new PainterPanelImpl();
 
     private volatile long currentTime;
     private volatile ParsedSequence sequence = ParsedSequence.createEmpty();
-
-    /**
-     * Constructs a new {@link PainterPanel}
-     */
-    public PainterPanel() {
-        this(new Canvas());
-    }
-
-    @VisibleForTesting
-    PainterPanel(Canvas canvas) {
-        this.canvas = canvas;
-
-        panel.setLayout(new BorderLayout());
-        panel.add(canvas);
-        panel.setIgnoreRepaint(true);
-
-        final Painter painter = new Painter(canvas.getSize());
-        canvas.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                painter.setComponentDimensions(e.getComponent().getSize());
-            }
-        });
-
-        painterThread = new Thread("painter thread") {
-            @Override
-            public synchronized void run() {
-                try {
-                    final BufferStrategy buffer = canvas.getBufferStrategy();
-
-                    while (true) {
-                        final Graphics2D graphics = (Graphics2D) buffer.getDrawGraphics();
-                        painter.paint(graphics, currentTime, sequence);
-                        graphics.dispose();
-                        buffer.show();
-
-                        wait(TimeUnit.SECONDS.toMillis(1) / 60);
-                    }
-                } catch (final InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        };
-    }
-
-    /**
-     * Starts drawing the current parsed sequence into this component.
-     *
-     * @throws IllegalThreadStateException
-     *             if the painter panel has already been started
-     */
-    public void start() {
-        canvas.createBufferStrategy(2);
-        painterThread.start();
-    }
 
     /**
      * Gets the panel associated with this component
@@ -96,10 +55,8 @@ public class PainterPanel {
      *            the current song time in microseconds
      */
     public void setCurrentTime(long currentTime) {
-        synchronized (painterThread) {
-            this.currentTime = currentTime;
-            painterThread.notify();
-        }
+        this.currentTime = currentTime;
+        panel.repaint();
     }
 
     /**
@@ -109,25 +66,6 @@ public class PainterPanel {
      *            the parsed sequence to set
      */
     public void setCurrentSequence(ParsedSequence sequence) {
-        synchronized (painterThread) {
-            this.sequence = sequence;
-            painterThread.notify();
-        }
-    }
-
-    /**
-     * Stops drawing the current parsed sequence into this component.
-     * <p>
-     * This can only be called once, and must be called when the application is
-     * closed.
-     * <p>
-     * This method blocks until the painter thread has exited.
-     *
-     * @throws InterruptedException
-     *             if the current thread is interrupted
-     */
-    public void stop() throws InterruptedException {
-        painterThread.interrupt();
-        painterThread.join();
+        this.sequence = sequence;
     }
 }
