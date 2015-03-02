@@ -198,7 +198,7 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
     }
 
     /**
-     * Inserts a entry as a child of this entry
+     * Inserts a entry as a child of this entry, without rebalancing the tree.
      */
     void insertNode(Entry<K, V> entry) {
         if (entry.key.compareTo(getKey()) < 0) {

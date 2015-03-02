@@ -1,95 +1,73 @@
 package net.kreatious.pianoleopard.intervalset;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests for {@link IntervalSet}
  *
  * @author Jay-R Studer
  */
-@RunWith(Parameterized.class)
 public class IntervalSetTest {
-    private static final IntervalSet<Integer, String> SET = new IntervalSet<>();
+    private final IntervalSet<Integer, Integer> set = new IntervalSet<>();
 
     /**
-     * Bounds for the test case
-     */
-    @Parameter(0)
-    public Interval<Integer> interval;
-
-    /**
-     * The values expected to be returned by the test.
-     * <p>
-     * These are calculated using the naive O(N) algorithm.
-     */
-    @Parameter(1)
-    public List<String> expectedValues;
-
-    /**
-     * Provides a list of parameters to inject into the parameter fields
-     *
-     * @return a list of test cases
-     */
-    @Parameters(name = "interval [{0}] contains {1}")
-    public static List<Object[]> parameters() {
-        final List<Interval<Integer>> intervals = createTestIntervals();
-        intervals.forEach(interval -> SET.put(interval.getLow(), interval.getHigh(), interval.toString()));
-
-        final List<Object[]> tests = new ArrayList<>();
-        final int max = intervals.stream().map(Interval::getHigh).max(Integer::compare).get();
-        for (int i = 0; i <= max; i++) {
-            for (int intervalSize = 0; intervalSize != 10; intervalSize++) {
-                final Interval<Integer> testInterval = new Interval<>(i, i + intervalSize);
-
-                final List<String> expectedValues = intervals.stream()
-                        .filter(interval -> interval.containsInterval(testInterval)).map(Interval::toString)
-                        .collect(toList());
-                tests.add(new Object[] { testInterval, expectedValues });
-            }
-        }
-        return tests;
-    }
-
-    /**
-     * Tests that {@link IntervalSet#subSet} returns only the expected values
+     * Tests {@link IntervalSet#clear()}
      */
     @Test
-    public void testSubSet() {
-        final Iterable<String> result = SET.subSet(interval.getLow(), interval.getHigh());
-        expectedValues.forEach(value -> assertThat(result, hasItem(value)));
-        assertThat(result, iterableWithSize(expectedValues.size()));
+    public void testClear() {
+        addValues(10);
+
+        set.clear();
+        assertThat(set.size(), is(0));
+        assertThat(set, is(emptyIterable()));
     }
 
-    private static List<Interval<Integer>> createTestIntervals() {
-        final List<Interval<Integer>> intervals = new ArrayList<>();
-        for (int i = 0; i != 5; i++) {
-            // Points
-            intervals.add(new Interval<>(i, i));
+    /**
+     * Tests {@link IntervalSet#size()}
+     */
+    @Test
+    public void testSize() {
+        addValues(10);
 
-            // Non overlapping intervals - [10, 11], [12, 13]
-            intervals.add(new Interval<>(10 + i * 2, 10 + i * 2 + 1));
+        assertThat(set.size(), is(10));
+        assertThat(set, iterableWithSize(10));
+    }
 
-            // Touching intervals - [20, 22], [22, 24]
-            intervals.add(new Interval<>(20 + i * 2, 20 + i * 2 + 2));
+    /**
+     * Tests {@link IntervalSet#iterator()}
+     */
+    @Test
+    public void testIterator() {
+        final Integer[] addedValues = addValues(8);
 
-            // Overlapping intervals by 1 - [40, 43], [42, 45]
-            intervals.add(new Interval<>(40 + i * 2, 40 + i * 2 + 3));
+        assertThat(set, contains(addedValues));
+    }
 
-            // Overlapping intervals by 3 - [60, 64], [62, 66]
-            intervals.add(new Interval<>(60 + i * 2, 60 + i * 2 + 4));
+    /**
+     * Tests {@link IntervalSet#put(Comparable, Comparable, Object)}
+     */
+    @Test
+    public void testPut() {
+        for (int i = 0; i != 10; i++) {
+            set.put(i, i, i);
+            assertThat(set, contains(IntStream.rangeClosed(0, i).boxed().toArray()));
         }
-        return intervals;
+    }
+
+    private Integer[] addValues(int count) {
+        final Integer[] addedValues = new Integer[count];
+        for (int i = 0; i != count; i++) {
+            set.put(i, i, i);
+            addedValues[i] = i;
+        }
+        return addedValues;
     }
 }
