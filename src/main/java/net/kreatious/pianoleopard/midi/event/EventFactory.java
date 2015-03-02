@@ -35,8 +35,8 @@ public class EventFactory {
             return Optional.empty();
         }
 
-        final long time = cache.ticksToMicroseconds(event.getTick());
         final ShortMessage message = (ShortMessage) event.getMessage();
+        final long time = cache.ticksToMicroseconds(event.getTick()) + message.getData1() + (message.getChannel() << 8);
         if (NoteEvent.canCreate(message)) {
             return Optional.of(new NoteEvent(message, time));
         } else if (PedalEvent.canCreate(message)) {
