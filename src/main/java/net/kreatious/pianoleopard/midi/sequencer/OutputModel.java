@@ -91,10 +91,6 @@ public class OutputModel implements AutoCloseable {
      * Starts playback of the currently loaded MIDI file.
      */
     public void start() {
-        if (tickThread.getState() == State.NEW) {
-            tickThread.start();
-        }
-
         sequencer.setMicrosecondPosition(0);
         receiver.ifPresent(OutputModel::resetReceiver);
         sequencer.start();
@@ -117,6 +113,10 @@ public class OutputModel implements AutoCloseable {
     @VisibleForTesting
     void openMidiFile(InputStream midiStream) throws IOException {
         try {
+            if (tickThread.getState() == State.NEW) {
+                tickThread.start();
+            }
+
             sequence = ParsedSequence.parseByTracks(MidiSystem.getSequence(midiStream));
             sequencer.stop();
             sequencer.setSequence(sequence.getSequence());
