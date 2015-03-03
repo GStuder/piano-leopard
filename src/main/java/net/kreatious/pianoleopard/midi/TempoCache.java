@@ -49,21 +49,24 @@ public class TempoCache {
             return;
         }
 
-        // Effective tempo in microseconds per quarter note, keyed by MIDI ticks
-        tempos = Stream.of(sequence.getTracks())
+        // Get set tempo messages in micros per quarter note, keyed by ticks
+        tempos = Stream
+                .of(sequence.getTracks())
+                .limit(1)
                 .flatMap(track -> IntStream.range(0, track.size()).mapToObj(track::get))
                 .filter(midiEvent -> midiEvent.getMessage().getStatus() == MetaMessage.META)
                 .filter(midiEvent -> midiEvent.getMessage().getMessage()[1] == 0x51)
                 .filter(midiEvent -> midiEvent.getMessage().getMessage()[2] == 0x03)
-                .collect(collectingAndThen(toMap(MidiEvent::getTick, TempoCache::extractTempo, (key, value) -> {
-                    throw new IllegalStateException("Duplicate key " + key);
-                }, TreeMap::new), (Map<Long, Integer> map) -> (NavigableMap<Long, Integer>) map));
+                .collect(
+                        collectingAndThen(
+                                toMap(MidiEvent::getTick, TempoCache::extractTempo, (oldValue, newValue) -> newValue,
+                                        TreeMap::new), (Map<Long, Integer> map) -> (NavigableMap<Long, Integer>) map));
 
         // The default unspecified PPQ tempo is 0.5s per quarter note
         int previousTempo = 500000;
         tempos.putIfAbsent(0L, previousTempo);
 
-        // Cache the elapsed microsecond durations keyed by MIDI event ticks
+        // Cache the total elapsed microsecond durations, keyed by ticks
         long previousEventTick = 0;
         long elapsedMicroseconds = 0;
         for (final Entry<Long, Integer> tempo : tempos.entrySet()) {
