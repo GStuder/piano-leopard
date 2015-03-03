@@ -1,6 +1,8 @@
 package net.kreatious.pianoleopard.midi.sequencer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,8 +19,6 @@ import net.kreatious.pianoleopard.midi.event.EventFactory;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
-
-import com.google.common.collect.Lists;
 
 /**
  * Model for the MIDI input keyboard, allows controllers to listen for events.
@@ -60,31 +60,17 @@ public class InputModel implements AutoCloseable, ParsedTrack {
     private void setCurrentSequence(@SuppressWarnings("unused") ParsedSequence sequence) {
         notes.clear();
         pedals.clear();
+        receiver.clear();
     }
 
-    private final class ReceiverImpl implements Receiver {
+    private final class ReceiverImpl implements Receiver, ParsedTrack {
         private final Map<Object, NoteEvent> onNotes = new HashMap<>();
         private final Map<Object, PedalEvent> onPedals = new HashMap<>();
 
         private long currentTime;
 
         private synchronized void setCurrentTime(long time) {
-            resizeIncompletedOnEvents(time, onNotes, notes);
-            resizeIncompletedOnEvents(time, onPedals, pedals);
             currentTime = time;
-        }
-
-        private <K extends Event> void resizeIncompletedOnEvents(long time, Map<Object, K> onEvents,
-                IntervalSet<Long, EventPair<K>> fullEvents) {
-            synchronized (fullEvents) {
-                for (final K onEvent : onEvents.values()) {
-                    fullEvents.removeFirst(onEvent.getTime(), currentTime, pair -> pair.getOn().equals(onEvent))
-                            .ifPresent(removed -> {
-                                final EventPair<K> resizedPair = removed.withOffTime(time);
-                                fullEvents.put(resizedPair.getOnTime(), resizedPair.getOffTime(), resizedPair);
-                            });
-                }
-            }
         }
 
         @Override
@@ -106,7 +92,6 @@ public class InputModel implements AutoCloseable, ParsedTrack {
                 final long eventTime = event.getTime();
                 if (event.isOn()) {
                     onEvents.put(event.getSlot(), event);
-                    fullEvents.put(eventTime, eventTime, new EventPair<>(event, event.createOff(eventTime)));
                 } else {
                     Optional.ofNullable(onEvents.remove(event.getSlot())).ifPresent(onEvent -> {
                         fullEvents.put(onEvent.getTime(), eventTime, new EventPair<>(onEvent, event));
@@ -116,22 +101,37 @@ public class InputModel implements AutoCloseable, ParsedTrack {
         }
 
         @Override
+        public Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
+            return getPairs(low, high, onNotes, notes);
+        }
+
+        @Override
+        public Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
+            return getPairs(low, high, onPedals, pedals);
+        }
+
+        private <K extends Event> Iterable<EventPair<K>> getPairs(long low, long high, Map<Object, K> onEvents,
+                IntervalSet<Long, EventPair<K>> fullEvents) {
+            synchronized (fullEvents) {
+                final List<EventPair<K>> result = new ArrayList<>();
+                fullEvents.subSet(low, high).forEach(result::add);
+                onEvents.values().forEach(event -> result.add(new EventPair<>(event, event.createOff(currentTime))));
+                return result;
+            }
+        }
+
+        void clear() {
+            synchronized (notes) {
+                onNotes.clear();
+            }
+            synchronized (pedals) {
+                onPedals.clear();
+            }
+        }
+
+        @Override
         public void close() {
             // Intentionally empty; this receiver holds no system resources
-        }
-    }
-
-    @Override
-    public Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
-        synchronized (notes) {
-            return Lists.newArrayList(notes.subSet(low, high));
-        }
-    }
-
-    @Override
-    public Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
-        synchronized (pedals) {
-            return Lists.newArrayList(pedals.subSet(low, high));
         }
     }
 
@@ -154,5 +154,15 @@ public class InputModel implements AutoCloseable, ParsedTrack {
     @Override
     public void close() throws Exception {
         input.ifPresent(MidiDevice::close);
+    }
+
+    @Override
+    public Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
+        return receiver.getNotePairs(low, high);
+    }
+
+    @Override
+    public Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
+        return receiver.getPedalPairs(low, high);
     }
 }

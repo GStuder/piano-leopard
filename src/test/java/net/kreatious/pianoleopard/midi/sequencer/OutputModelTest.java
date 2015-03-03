@@ -1,12 +1,12 @@
 package net.kreatious.pianoleopard.midi.sequencer;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -162,7 +162,7 @@ public class OutputModelTest {
         outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"));
         outputModel.start();
 
-        verify(currentTimeListener, timeout(120).atLeast(2)).accept(anyLong());
+        then(currentTimeListener).should(timeout(120).atLeast(2)).accept(anyLong());
 
         outputModel.close();
     }
@@ -181,6 +181,6 @@ public class OutputModelTest {
         outputModel.setOutputDevice(output);
         outputModel.sendMessage(message);
 
-        verify(output.getReceiver()).send(message, -1);
+        then(output.getReceiver()).should().send(message, -1);
     }
 }
