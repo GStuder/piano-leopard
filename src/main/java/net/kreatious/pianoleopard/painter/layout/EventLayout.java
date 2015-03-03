@@ -66,45 +66,4 @@ public interface EventLayout {
      * @return the highest visible time in microseconds that can be laid out
      */
     long getHighestVisibleTime(long currentTime);
-
-    /**
-     * Decorates this strategy with the specified strategy.
-     *
-     * @param next
-     *            the next strategy to apply after this strategy is called
-     * @return a new decorated layout strategy
-     */
-    default EventLayout thenApply(EventLayout next) {
-        return new EventLayout() {
-            private final EventLayout eventLayout = EventLayout.this;
-
-            @Override
-            public void layoutNote(long currentTime, EventPair<NoteEvent> event, Rectangle rect) {
-                eventLayout.layoutNote(currentTime, event, rect);
-                next.layoutNote(currentTime, event, rect);
-            }
-
-            @Override
-            public void layoutPedal(long currentTime, EventPair<PedalEvent> event, Rectangle rect) {
-                eventLayout.layoutPedal(currentTime, event, rect);
-                next.layoutPedal(currentTime, event, rect);
-            }
-
-            @Override
-            public void setComponentDimensions(Dimension dimension) {
-                eventLayout.setComponentDimensions(dimension);
-                next.setComponentDimensions(dimension);
-            }
-
-            @Override
-            public long getLowestVisibleTime(long currentTime) {
-                return eventLayout.getLowestVisibleTime(currentTime);
-            }
-
-            @Override
-            public long getHighestVisibleTime(long currentTime) {
-                return eventLayout.getHighestVisibleTime(currentTime);
-            }
-        };
-    }
 }

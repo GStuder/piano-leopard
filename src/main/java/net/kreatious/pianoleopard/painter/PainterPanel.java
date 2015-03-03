@@ -9,6 +9,7 @@ import java.awt.event.ComponentEvent;
 import javax.swing.JPanel;
 
 import net.kreatious.pianoleopard.midi.ParsedSequence;
+import net.kreatious.pianoleopard.midi.ParsedTrack;
 
 /**
  * Renders the currently playing sequence into a panel using double buffering.
@@ -32,14 +33,26 @@ public class PainterPanel {
 
         @Override
         public void paint(Graphics g) {
-            painter.paint((Graphics2D) g, currentTime, sequence);
+            painter.paint((Graphics2D) g, currentTime, sequence, playedTrack);
         }
     }
 
     private final JPanel panel = new PainterPanelImpl();
+    private final ParsedTrack playedTrack;
 
     private volatile long currentTime;
     private volatile ParsedSequence sequence = ParsedSequence.createEmpty();
+
+    /**
+     * Constructs a new {@link PainterPanel} connected to the specified track
+     * containing events played by the user
+     *
+     * @param playedTrack
+     *            the track of events played by the user
+     */
+    public PainterPanel(ParsedTrack playedTrack) {
+        this.playedTrack = playedTrack;
+    }
 
     /**
      * Gets the panel associated with this component

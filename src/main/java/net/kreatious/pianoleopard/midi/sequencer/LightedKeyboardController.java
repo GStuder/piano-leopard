@@ -35,12 +35,6 @@ public class LightedKeyboardController {
         this.outputModel = outputModel;
     }
 
-    private LightedKeyboardController start() {
-        outputModel.addCurrentTimeListener(this::setCurrentTime);
-        outputModel.addOpenListener(this::setCurrentSequence);
-        return this;
-    }
-
     /**
      * Constructs and starts a new instance of {@link LightedKeyboardController}
      * to control a lighted keyboard. After construction, keys in the current
@@ -51,7 +45,10 @@ public class LightedKeyboardController {
      * @return a new instance of {@link LightedKeyboardController}
      */
     public static LightedKeyboardController create(OutputModel outputModel) {
-        return new LightedKeyboardController(outputModel).start();
+        final LightedKeyboardController result = new LightedKeyboardController(outputModel);
+        result.outputModel.addCurrentTimeListener(result::setCurrentTime);
+        result.outputModel.addOpenListener(result::setCurrentSequence);
+        return result;
     }
 
     private void setCurrentSequence(ParsedSequence sequence) {

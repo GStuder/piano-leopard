@@ -14,6 +14,7 @@ import net.kreatious.pianoleopard.midi.ParsedTrack;
 class Painter {
     private final BackgroundPainter backgroundPainter;
     private final EventPainter activeEventPainter;
+    private final EventPainter playedEventPainter;
     private final ForegroundPainter foregroundPainter;
 
     /**
@@ -21,11 +22,12 @@ class Painter {
      * dimensions
      *
      * @param dimension
-     *            the inital component dimensions to paint within
+     *            the initial component dimensions to paint within
      */
     Painter(Dimension dimension) {
         backgroundPainter = BackgroundPainter.create(dimension);
         activeEventPainter = EventPainter.createActiveEventPainter(dimension);
+        playedEventPainter = EventPainter.createPlayedEventPainter(dimension);
         foregroundPainter = ForegroundPainter.create(dimension);
     }
 
@@ -38,13 +40,17 @@ class Painter {
      *            the current song time in microseconds
      * @param sequence
      *            the MIDI sequence to render
+     * @param playedTrack
+     *            the track of events receiving notes played by the user
      */
-    void paint(Graphics2D graphics, long currentTime, ParsedSequence sequence) {
+    void paint(Graphics2D graphics, long currentTime, ParsedSequence sequence, ParsedTrack playedTrack) {
         backgroundPainter.paint(graphics);
 
         for (final ParsedTrack track : sequence.getTracks()) {
             activeEventPainter.paint(currentTime, graphics, track);
         }
+
+        playedEventPainter.paint(currentTime, graphics, playedTrack);
 
         foregroundPainter.paint(graphics);
     }
@@ -58,6 +64,7 @@ class Painter {
     void setComponentDimensions(Dimension dimension) {
         backgroundPainter.setComponentDimensions(dimension);
         activeEventPainter.setComponentDimensions(dimension);
+        playedEventPainter.setComponentDimensions(dimension);
         foregroundPainter.setComponentDimensions(dimension);
     }
 }

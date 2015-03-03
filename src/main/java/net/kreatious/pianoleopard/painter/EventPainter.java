@@ -10,6 +10,7 @@ import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
 import net.kreatious.pianoleopard.painter.layout.DefaultEventLayout;
 import net.kreatious.pianoleopard.painter.layout.EventLayout;
+import net.kreatious.pianoleopard.painter.layout.PlayedEventLayout;
 
 /**
  * Paints events into a graphics context using a predetermined layout strategy.
@@ -71,6 +72,18 @@ class EventPainter {
      */
     static EventPainter createActiveEventPainter(Dimension dimension) {
         return new EventPainter(new ActiveNoteStyleStrategy(), new ActivePedalStyleStrategy(), new DefaultEventLayout(
+                dimension));
+    }
+
+    /**
+     * Constructs a new event painter for painting played events.
+     *
+     * @param dimension
+     *            the initial component dimensions
+     * @return a new {@link EventPainter}
+     */
+    static EventPainter createPlayedEventPainter(Dimension dimension) {
+        return new EventPainter(new PlayedNoteStyleStrategy(), new PlayedPedalStyleStrategy(), new PlayedEventLayout(
                 dimension));
     }
 
