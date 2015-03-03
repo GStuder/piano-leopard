@@ -105,15 +105,15 @@ public class OutputModelTest {
      */
     @Test
     public void testStart() throws IOException, InvalidMidiDataException, InterruptedException {
-        final Consumer<ParsedSequence> openListener = mock(Consumer.class);
-        outputModel.addOpenListener(openListener);
+        final Consumer<ParsedSequence> startListener = mock(Consumer.class);
+        outputModel.addStartListener(startListener);
         outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"));
         outputModel.start();
         outputModel.close();
 
-        final InOrder order = inOrder(openListener, sequencer);
+        final InOrder order = inOrder(startListener, sequencer);
         order.verify(sequencer).setSequence(any());
-        order.verify(openListener).accept(any());
+        order.verify(startListener).accept(any());
         order.verify(sequencer).setMicrosecondPosition(0);
         order.verify(sequencer).start();
         order.verify(sequencer).close();

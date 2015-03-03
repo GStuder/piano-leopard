@@ -36,7 +36,7 @@ public class OutputModel implements AutoCloseable {
     private Optional<MidiDevice> output = Optional.empty();
     private Optional<Receiver> receiver = Optional.empty();
 
-    private final List<Consumer<? super ParsedSequence>> openListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<? super ParsedSequence>> startListeners = new CopyOnWriteArrayList<>();
     private final List<LongConsumer> currentTimeListeners = new CopyOnWriteArrayList<>();
 
     private final Thread tickThread = new Thread() {
@@ -92,8 +92,10 @@ public class OutputModel implements AutoCloseable {
      * Starts playback of the currently loaded MIDI file.
      */
     public void start() {
+        sequencer.stop();
         sequencer.setMicrosecondPosition(0);
         receiver.ifPresent(OutputModel::resetReceiver);
+        startListeners.forEach(listener -> listener.accept(sequence));
         sequencer.start();
     }
 
@@ -123,20 +125,21 @@ public class OutputModel implements AutoCloseable {
             sequencer.setSequence(sequence.getSequence());
             sequencer.setMicrosecondPosition(0);
             receiver.ifPresent(OutputModel::resetReceiver);
-            openListeners.forEach(listener -> listener.accept(sequence));
+            startListeners.forEach(listener -> listener.accept(sequence));
         } catch (final InvalidMidiDataException e) {
             throw new IOException(e);
         }
     }
 
     /**
-     * Adds a listener to notify when a MIDI file is opened and has been parsed.
+     * Adds a listener to notify when a parsed MIDI file is started from the
+     * beginning.
      *
      * @param listener
      *            the listener to add
      */
-    public void addOpenListener(Consumer<? super ParsedSequence> listener) {
-        openListeners.add(listener);
+    public void addStartListener(Consumer<? super ParsedSequence> listener) {
+        startListeners.add(listener);
     }
 
     /**

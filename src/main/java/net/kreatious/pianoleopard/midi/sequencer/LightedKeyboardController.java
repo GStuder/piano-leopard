@@ -47,7 +47,7 @@ public class LightedKeyboardController {
     public static LightedKeyboardController create(OutputModel outputModel) {
         final LightedKeyboardController result = new LightedKeyboardController(outputModel);
         result.outputModel.addCurrentTimeListener(result::setCurrentTime);
-        result.outputModel.addOpenListener(result::setCurrentSequence);
+        result.outputModel.addStartListener(result::setCurrentSequence);
         return result;
     }
 
