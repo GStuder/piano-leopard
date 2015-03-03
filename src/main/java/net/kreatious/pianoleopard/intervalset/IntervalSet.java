@@ -31,7 +31,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
 
     /**
      * Returns the size of this set.
-     * 
+     *
      * @return the number of values in this collection
      */
     public int size() {
@@ -65,7 +65,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
             return Optional.empty();
         }
 
-        final Optional<Entry<K, V>> parent = root.get().binarySearch(key);
+        final Optional<Entry<K, V>> parent = root.get().binarySearchInexact(key);
         if (parent.filter(p -> p.getKey().compareTo(key) == 0).isPresent()) {
             return Optional.of(parent.get().setValue(value));
         }
@@ -75,6 +75,32 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
         root = entry.rebalance(root);
         size++;
         modifications++;
+        return Optional.empty();
+    }
+
+    /**
+     * Removes the value for the specified interval from this set, if present.
+     *
+     * @param low
+     *            the low end of the range the specified value to associate
+     * @param high
+     *            the high end of the range the specified value to associate
+     * @return the previous value associated with the interval, or empty if
+     *         there was no mapping for the interval.
+     * @throws IllegalArgumentException
+     *             if {@code low} is greater than {@code high}
+     * @throws NullPointerException
+     *             if the specified key is null
+     */
+    public Optional<V> remove(K low, K high) {
+        final Optional<Entry<K, V>> entryToRemove = root.flatMap(entry -> entry.binarySearchExact(new Interval<>(low,
+                high)));
+        if (entryToRemove.isPresent()) {
+            size--;
+            modifications++;
+            root = entryToRemove.get().remove(root);
+            return entryToRemove.map(Entry::getValue);
+        }
         return Optional.empty();
     }
 

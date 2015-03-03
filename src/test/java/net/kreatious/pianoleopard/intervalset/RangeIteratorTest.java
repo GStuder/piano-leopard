@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -67,7 +66,6 @@ public class RangeIteratorTest {
                 tests.add(new Object[] { testInterval, expectedValues });
             }
         }
-        Collections.shuffle(tests);
         return tests;
     }
 
