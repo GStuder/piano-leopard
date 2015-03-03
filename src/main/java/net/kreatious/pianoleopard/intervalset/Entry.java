@@ -1,17 +1,20 @@
 package net.kreatious.pianoleopard.intervalset;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
+class Entry<K extends Comparable<K>, V> {
     private Interval<K> key;
     private K maximum;
-    private V value;
+    private Set<V> values;
     private Optional<Entry<K, V>> left = Optional.empty();
     private Optional<Entry<K, V>> right = Optional.empty();
     private Optional<Entry<K, V>> parent = Optional.empty();
@@ -20,7 +23,7 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
     Entry(Interval<K> key, V value, Optional<Entry<K, V>> parent) {
         Objects.requireNonNull(value);
         this.key = key;
-        this.value = value;
+        this.values = new HashSet<>(Arrays.asList(value));
         this.parent = parent;
         this.maximum = key.getHigh();
     }
@@ -178,7 +181,7 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
             }
 
             key = inOrderSuccessor.key;
-            value = inOrderSuccessor.value;
+            values = inOrderSuccessor.values;
             return inOrderSuccessor.remove(root);
         }
 
@@ -371,22 +374,17 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
         }
     }
 
-    @Override
-    public Interval<K> getKey() {
+    Interval<K> getKey() {
         return key;
     }
 
-    @Override
-    public V getValue() {
-        return value;
+    Set<V> getValues() {
+        return values;
     }
 
-    @Override
-    public V setValue(V value) {
+    boolean addValue(V value) {
         Objects.requireNonNull(value);
-        final V result = this.value;
-        this.value = value;
-        return result;
+        return values.add(value);
     }
 
     @Override
@@ -403,7 +401,7 @@ class Entry<K extends Comparable<K>, V> implements Map.Entry<Interval<K>, V> {
 
     @Override
     public int hashCode() {
-        return key.hashCode() ^ value.hashCode();
+        return key.hashCode() ^ values.hashCode();
     }
 
     @Override

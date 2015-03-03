@@ -2,12 +2,14 @@ package net.kreatious.pianoleopard.intervalset;
 
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * An ordered tree data structure for holding intervals. The user can
  * efficiently find all intervals that overlap with a given interval or point.
  * <p>
- * This set does not support null keys or values.
+ * This set does not support null keys or values, but does support duplicate
+ * intervals.
  *
  * @author Jay-R Studer
  * @param <K>
@@ -67,7 +69,12 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
 
         final Optional<Entry<K, V>> parent = root.get().binarySearchInexact(key);
         if (parent.filter(p -> p.getKey().compareTo(key) == 0).isPresent()) {
-            return Optional.of(parent.get().setValue(value));
+            if (parent.get().addValue(value)) {
+                size++;
+                modifications++;
+                return Optional.empty();
+            }
+            return Optional.of(value);
         }
 
         final Entry<K, V> entry = new Entry<>(key, value, parent);
@@ -79,29 +86,42 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
     }
 
     /**
-     * Removes the value for the specified interval from this set, if present.
+     * Removes the first value for the specified interval from this set that
+     * matches the given criteria.
      *
      * @param low
      *            the low end of the range the specified value to associate
      * @param high
      *            the high end of the range the specified value to associate
-     * @return the previous value associated with the interval, or empty if
-     *         there was no mapping for the interval.
+     * @param criteria
+     *            the value to delete
+     * @return the removed value, or empty if no value was removed
      * @throws IllegalArgumentException
      *             if {@code low} is greater than {@code high}
      * @throws NullPointerException
      *             if the specified key is null
      */
-    public Optional<V> remove(K low, K high) {
+    public Optional<V> removeFirst(K low, K high, Predicate<? super V> criteria) {
         final Optional<Entry<K, V>> entryToRemove = root.flatMap(entry -> entry.binarySearchExact(new Interval<>(low,
                 high)));
-        if (entryToRemove.isPresent()) {
-            size--;
-            modifications++;
-            root = entryToRemove.get().remove(root);
-            return entryToRemove.map(Entry::getValue);
+        if (!entryToRemove.isPresent()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        final Entry<K, V> entry = entryToRemove.get();
+        final Optional<V> result = entry.getValues().stream().filter(criteria).findAny();
+        if (!result.isPresent()) {
+
+            return Optional.empty();
+        }
+
+        entry.getValues().remove(result);
+        if (entry.getValues().isEmpty()) {
+            root = entry.remove(root);
+        }
+        size--;
+        modifications++;
+        return result;
     }
 
     /**

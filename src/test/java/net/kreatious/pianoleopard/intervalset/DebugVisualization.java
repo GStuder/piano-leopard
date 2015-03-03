@@ -194,10 +194,10 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         final JButton step = new JButton("Step");
         step.addActionListener(event -> {
             ranges.forEach(new BiConsumer<Iterator<V>, Decorations>() {
-                final Map<V, Entry<K, V>> entries = new IdentityHashMap<V, Entry<K, V>>() {
+                final Map<Set<V>, Entry<K, V>> entries = new IdentityHashMap<Set<V>, Entry<K, V>>() {
                     private static final long serialVersionUID = 7676204394757535429L;
                     {
-                        visitChildren(set.getRoot().get(), entry -> put(entry.getValue(), entry));
+                        visitChildren(set.getRoot().get(), entry -> put(entry.getValues(), entry));
                     }
                 };
 

@@ -16,7 +16,7 @@ import net.kreatious.pianoleopard.midi.event.EventPair;
  * @author Jay-R Studer
  */
 abstract class TrackVisitor {
-    private final Map<Object, Event> incompleteNotes = new HashMap<>();
+    private final Map<Object, Event> incompleteEvents = new HashMap<>();
 
     /**
      * Invokes this visitor on the specified track.
@@ -31,9 +31,9 @@ abstract class TrackVisitor {
             EventFactory.create(track.get(i), cache).ifPresent(
                     event -> {
                         if (event.isOn()) {
-                            incompleteNotes.put(event.getSlot(), event);
+                            incompleteEvents.put(event.getSlot(), event);
                         } else {
-                            Optional.ofNullable(incompleteNotes.remove(event.getSlot())).ifPresent(
+                            Optional.ofNullable(incompleteEvents.remove(event.getSlot())).ifPresent(
                                     previousOnEvent -> visitEventPair(new EventPair<>(previousOnEvent, event)));
                         }
                     });

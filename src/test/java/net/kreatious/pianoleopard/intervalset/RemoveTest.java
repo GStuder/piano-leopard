@@ -31,8 +31,8 @@ public class RemoveTest {
     static {
         final Random rnd = new Random(311);
         for (int i = 0; i != 200; i++) {
-            final int low = rnd.nextInt(100);
-            final int high = low + rnd.nextInt(100);
+            final int low = rnd.nextInt(25);
+            final int high = low + rnd.nextInt(25);
             INTERVALS.add(new Interval<>(low, high));
         }
     }
@@ -76,11 +76,11 @@ public class RemoveTest {
     }
 
     /**
-     * Tests that {@link IntervalSet#remove} removes only one element
+     * Tests that {@link IntervalSet#removeFirst} removes only one element
      */
     @Test
     public void testRemove() {
-        set.remove(interval.getLow(), interval.getHigh());
+        set.removeFirst(interval.getLow(), interval.getHigh(), (x) -> true);
 
         final Iterable<String> result = Lists.newArrayList(set.iterator());
         expectedValues.forEach(value -> assertThat(result, hasItem(value)));

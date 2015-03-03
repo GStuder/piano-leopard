@@ -4,6 +4,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Provides in order iteration over an entire set
@@ -14,11 +15,13 @@ class InOrderIterator<K extends Comparable<K>, V> implements Iterator<V> {
     private final IntervalSet<K, V> set;
     private final int expectedModifications;
     private Optional<Entry<K, V>> next;
+    private Optional<Iterator<V>> subiterator;
 
     InOrderIterator(IntervalSet<K, V> set) {
         this.set = set;
         expectedModifications = set.getModifications();
         next = findSmallestEntry();
+        subiterator = next.map(Entry::getValues).map(Set::iterator);
     }
 
     private Optional<Entry<K, V>> findSmallestEntry() {
@@ -31,20 +34,23 @@ class InOrderIterator<K extends Comparable<K>, V> implements Iterator<V> {
 
     @Override
     public final boolean hasNext() {
-        return next.isPresent();
+        return subiterator.map(Iterator::hasNext).orElse(false);
     }
 
     @Override
     public V next() {
-        if (!next.isPresent()) {
+        if (!subiterator.isPresent()) {
             throw new NoSuchElementException();
         } else if (set.getModifications() != expectedModifications) {
             throw new ConcurrentModificationException();
         }
 
-        final Optional<Entry<K, V>> result = next;
-        next = successor(result);
-        return result.get().getValue();
+        final V result = subiterator.map(Iterator::next).get();
+        if (!subiterator.map(Iterator::hasNext).orElse(false)) {
+            next = successor(next);
+            subiterator = next.map(Entry::getValues).map(Set::iterator);
+        }
+        return result;
     }
 
     private Optional<Entry<K, V>> successor(Optional<Entry<K, V>> entry) {
