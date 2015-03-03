@@ -1,11 +1,17 @@
 package net.kreatious.pianoleopard.intervalset;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.junit.Test;
@@ -52,6 +58,25 @@ public class IntervalSetTest {
     }
 
     /**
+     * Tests for duplicate interval removal
+     */
+    @Test
+    public void testRemove() {
+        final List<Integer> addedValues = new ArrayList<>();
+        addedValues.addAll(Arrays.asList(addValues(10)));
+        addedValues.addAll(Arrays.asList(addValues(10)));
+
+        for (final Iterator<Integer> it = addedValues.iterator(); it.hasNext();) {
+            final Integer value = it.next();
+            it.remove();
+
+            final Optional<Integer> result = set.removeFirst(value % 10, value % 10, x -> x.equals(value));
+            assertThat(result, is(Optional.of(value)));
+            assertThat(set, containsInAnyOrder(addedValues.stream().toArray()));
+        }
+    }
+
+    /**
      * Tests {@link IntervalSet#put(Comparable, Comparable, Object)}
      */
     @Test
@@ -65,8 +90,9 @@ public class IntervalSetTest {
     private Integer[] addValues(int count) {
         final Integer[] addedValues = new Integer[count];
         for (int i = 0; i != count; i++) {
-            set.put(i, i, i);
-            addedValues[i] = i;
+            final int value = set.size();
+            set.put(i, i, value);
+            addedValues[i] = value;
         }
         return addedValues;
     }

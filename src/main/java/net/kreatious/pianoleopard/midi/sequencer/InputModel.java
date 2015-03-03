@@ -89,10 +89,7 @@ public class InputModel implements AutoCloseable, ParsedTrack {
 
         @Override
         public synchronized void send(MidiMessage message, long timeStamp) {
-            final Optional<Event> create = EventFactory.create(message, currentTime);
-            if (create.isPresent()) {
-                userPressedEvent(create.get());
-            }
+            EventFactory.create(message, currentTime).ifPresent(this::userPressedEvent);
         }
 
         private void userPressedEvent(Event event) {

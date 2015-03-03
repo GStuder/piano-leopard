@@ -111,11 +111,10 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
         final Entry<K, V> entry = entryToRemove.get();
         final Optional<V> result = entry.getValues().stream().filter(criteria).findAny();
         if (!result.isPresent()) {
-
             return Optional.empty();
         }
 
-        entry.getValues().remove(result);
+        entry.getValues().remove(result.get());
         if (entry.getValues().isEmpty()) {
             root = entry.remove(root);
         }
