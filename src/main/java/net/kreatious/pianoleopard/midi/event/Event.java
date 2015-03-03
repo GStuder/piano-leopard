@@ -81,6 +81,19 @@ public abstract class Event {
      */
     public abstract Slot getSlot();
 
+    /**
+     * Creates a new off event of the same type and slot with the specified
+     * timestamp.
+     *
+     * @param offTime
+     *            the off time of the created event measured in microseconds
+     * @param <T>
+     *            the type of the created event, must be the same as the
+     *            declaring class.
+     * @return a new event that is off but with the specified timestamp
+     */
+    public abstract <T extends Event> T createOff(long offTime);
+
     @Override
     public String toString() {
         return "Event[" + (isOn() ? "on" : "off") + ", channel: " + channel + ", slot: " + getSlot() + ", time: "

@@ -68,6 +68,14 @@ public class NoteEvent extends Event {
         }
     }
 
+    private NoteEvent(int channel, long time, int key, int velocity, boolean on, Slot slot) {
+        super(channel, time);
+        this.key = key;
+        this.velocity = velocity;
+        this.on = on;
+        this.slot = slot;
+    }
+
     static boolean canCreate(ShortMessage message) {
         return message.getCommand() == ShortMessage.NOTE_OFF || message.getCommand() == ShortMessage.NOTE_ON;
     }
@@ -112,5 +120,11 @@ public class NoteEvent extends Event {
     @Override
     public Slot getSlot() {
         return slot;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public NoteEvent createOff(long offTime) {
+        return new NoteEvent(getChannel(), offTime, key, 127, false, slot);
     }
 }

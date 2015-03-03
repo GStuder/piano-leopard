@@ -21,8 +21,8 @@ public class ParsedSequence {
 
     private ParsedSequence(Sequence sequence, Track[] tracks, TempoCache cache) {
         this.sequence = sequence;
-        parsedTracks = Collections.unmodifiableList(Stream.of(tracks).map(track -> new ParsedTrack(track, cache))
-                .collect(toList()));
+        parsedTracks = Collections.unmodifiableList(Stream.of(tracks)
+                .map(track -> new ImmutableParsedTrack(track, cache)).collect(toList()));
     }
 
     /**

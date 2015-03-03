@@ -22,6 +22,13 @@ public class PedalEvent extends Event {
         slot = new Slot(message.getChannel(), pedal);
     }
 
+    private PedalEvent(int channel, long time, Pedal pedal, boolean on, Slot slot) {
+        super(channel, time);
+        this.pedal = pedal;
+        this.on = on;
+        this.slot = slot;
+    }
+
     static boolean canCreate(ShortMessage message) {
         return message.getCommand() == ShortMessage.CONTROL_CHANGE && message.getData1() >= 64
                 && message.getData1() <= 67;
@@ -42,5 +49,11 @@ public class PedalEvent extends Event {
     @Override
     public Slot getSlot() {
         return slot;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public PedalEvent createOff(long offTime) {
+        return new PedalEvent(getChannel(), offTime, pedal, false, slot);
     }
 }

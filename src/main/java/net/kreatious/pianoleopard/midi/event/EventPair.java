@@ -87,6 +87,22 @@ public class EventPair<T extends Event> {
         return on.getChannel();
     }
 
+    /**
+     * Creates a new off event pair of the same type and slot with the specified
+     * off timestamp.
+     *
+     * @param offTime
+     *            the new off time measured in microseconds, value must be after
+     *            the on time.
+     * @return a new event pair with the specified timestamp
+     */
+    public EventPair<T> withOffTime(long offTime) {
+        if (offTime < on.getTime()) {
+            throw new IllegalArgumentException("The offtime must be on or after the on time");
+        }
+        return new EventPair<>(on, on.createOff(offTime));
+    }
+
     @Override
     public String toString() {
         return on + ", " + off;
