@@ -24,7 +24,7 @@ public class PainterPanel {
         final Painter painter = new Painter(new Dimension());
 
         PainterPanelImpl() {
-            setPreferredSize(new Dimension(800, 400));
+            setPreferredSize(new Dimension(1000, 500));
             addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {

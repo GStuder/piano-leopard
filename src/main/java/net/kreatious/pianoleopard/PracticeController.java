@@ -23,19 +23,19 @@ class PracticeController {
      */
     static Component create(OutputModel outputModel) {
         final JButton button = new JButton("Practice");
-        outputModel.addStartListener(sequence -> updateName(button, sequence));
+        outputModel.addStartListener(sequence -> updateText(button, sequence));
         outputModel.addStartListener(sequence -> button.setEnabled(true));
         button.addActionListener(e -> outputModel.start());
         button.setEnabled(false);
         return button;
     }
 
-    private static void updateName(JButton button, ParsedSequence sequence) {
+    private static void updateText(JButton button, ParsedSequence sequence) {
         final Optional<String> fileName = sequence.getFile().map(File::getName);
         if (fileName.isPresent()) {
-            button.setName("Practice " + fileName);
+            button.setText("Practice " + fileName.get());
         } else {
-            button.setName("Practice");
+            button.setText("Practice");
         }
     }
 }

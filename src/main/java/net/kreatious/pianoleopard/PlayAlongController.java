@@ -23,10 +23,14 @@ class PlayAlongController {
      */
     static Component create(OutputModel outputModel) {
         final JToggleButton button = new JToggleButton("Play along");
-        button.setEnabled(false);
-        outputModel.addPlayListener(() -> button.setEnabled(true));
         button.addItemListener(e -> outputModel.setPlayAlong(e.getStateChange() == ItemEvent.SELECTED));
         button.addMouseListener(new ToggleListener(toggle -> outputModel.setPlayAlong(toggle ^ button.isSelected())));
+
+        button.setVisible(false);
+        outputModel.addStartListener(sequence -> button.setVisible(true));
+
+        button.setEnabled(false);
+        outputModel.addPlayListener(() -> button.setEnabled(true));
         return button;
     }
 }

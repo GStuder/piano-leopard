@@ -207,6 +207,22 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
+     * Seeks the sequence to the specified time
+     *
+     * @param time
+     *            the time in microseconds to seek to
+     */
+    public void setCurrentTime(long time) {
+        if (sequencer.isRunning()) {
+            sequencer.stop();
+            sequencer.setMicrosecondPosition(time);
+            sequencer.start();
+        } else {
+            sequencer.setMicrosecondPosition(time);
+        }
+    }
+
+    /**
      * Parses a MIDI file and prepares it for playback.
      * <p>
      * Any registered start listeners will be called with the parsed sequence.

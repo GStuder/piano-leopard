@@ -43,7 +43,8 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
     /**
      * Associates the specified interval with the specified value in this set.
      * If this set previously contained a mapping for the interval, the old
-     * value is replaced.
+     * value is replaced. If the specified interval is invalid, nothing is
+     * inserted.
      *
      * @param low
      *            the low end of the range the specified value to associate
@@ -53,12 +54,14 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
      *            value to be associated with the specified key
      * @return the previous value associated with the interval, or empty if
      *         there was no mapping for the interval.
-     * @throws IllegalArgumentException
-     *             if {@code low} is greater than {@code high}
      * @throws NullPointerException
      *             if the specified key or value is null
      */
     public Optional<V> put(K low, K high, V value) {
+        if (low.compareTo(high) > 0) {
+            return Optional.empty();
+        }
+
         final Interval<K> key = new Interval<>(low, high);
         if (!root.isPresent()) {
             root = Optional.of(new Entry<>(key, value, Optional.empty()));
