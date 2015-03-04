@@ -1,13 +1,12 @@
 package net.kreatious.pianoleopard;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -18,25 +17,15 @@ import net.kreatious.pianoleopard.midi.sequencer.InputModel;
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
 /**
- * Provides the action for the keyboard button
+ * Provides the controller for the keyboard action
  *
  * @author Jay-R Studer
  */
-class KeyboardAction extends AbstractAction {
-    private static final long serialVersionUID = 6330824397500171700L;
+class KeyboardController {
     private static final String INPUT_PREFERENCE = "inputDevice";
     private static final String OUTPUT_PREFERENCE = "outputDevice";
 
-    private final Component parent;
-    private final OutputModel outputModel;
-    private final InputModel inputModel;
-    private final SelectKeyboardDialog selectKeyboard;
-
-    private KeyboardAction(Component parent, Preferences preferences, OutputModel outputModel, InputModel inputModel) {
-        this.parent = parent;
-        this.outputModel = outputModel;
-        this.inputModel = inputModel;
-        selectKeyboard = new SelectKeyboardDialog(getLastKeyboard(preferences), new SystemMidiDeviceFactory());
+    private KeyboardController() {
     }
 
     /**
@@ -60,32 +49,34 @@ class KeyboardAction extends AbstractAction {
         return Optional.empty();
     }
 
+    /**
+     * Constructs a view and associates it with a controller
+     */
     static Component create(Component parent, Preferences preferences, OutputModel outputModel, InputModel inputModel) {
         outputModel.addOutputDeviceListener(info -> preferences.put(OUTPUT_PREFERENCE, info.getName()));
         inputModel.addInputDeviceListener(info -> preferences.put(INPUT_PREFERENCE, info.getName()));
 
-        final KeyboardAction action = new KeyboardAction(parent, preferences, outputModel, inputModel);
-        getLastKeyboard(preferences).ifPresent(action::setKeyboard);
-        action.putValue(NAME, "Keyboard...");
-        return new JButton(action);
-    }
+        final Consumer<Keyboard> switchKeyboard = keyboard -> {
+            try {
+                inputModel.setInputDevice(keyboard.getInput());
+                outputModel.setOutputDevice(keyboard.getOutput());
+            } catch (final MidiUnavailableException ex) {
+                ex.printStackTrace();
+                JOptionPane
+                        .showMessageDialog(
+                                parent,
+                                "Unable to select the MIDI keyboard. Check that the keyboard is not in use by another application.",
+                                "Error switching MIDI keyboard", JOptionPane.ERROR_MESSAGE);
+            }
+        };
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        selectKeyboard.showDialog(Optional.of(parent)).ifPresent(this::setKeyboard);
-    }
+        final Optional<Keyboard> lastKeyboard = getLastKeyboard(preferences);
+        lastKeyboard.ifPresent(switchKeyboard);
 
-    private void setKeyboard(Keyboard keyboard) {
-        try {
-            inputModel.setInputDevice(keyboard.getInput());
-            outputModel.setOutputDevice(keyboard.getOutput());
-        } catch (final MidiUnavailableException ex) {
-            ex.printStackTrace();
-            JOptionPane
-                    .showMessageDialog(
-                            parent,
-                            "Unable to select the MIDI keyboard. Check that the keyboard is not in use by another application.",
-                            "Error switching MIDI keyboard", JOptionPane.ERROR_MESSAGE);
-        }
+        final SelectKeyboardDialog selectKeyboard = new SelectKeyboardDialog(lastKeyboard,
+                new SystemMidiDeviceFactory());
+        final JButton button = new JButton("Keyboard...");
+        button.addActionListener(event -> selectKeyboard.showDialog(Optional.of(parent)).ifPresent(switchKeyboard));
+        return button;
     }
 }

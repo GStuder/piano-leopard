@@ -4,8 +4,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -18,15 +16,16 @@ import net.kreatious.pianoleopard.midi.ParsedTrack;
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
 /**
- * View for altering which tracks are being practiced. Tracks being practiced
- * are muted.
+ * Provides the controller for altering which tracks are being practiced.
  *
  * @author Jay-R Studer
  */
-class PracticeTrackView {
+class PracticeTrackController {
+    /**
+     * Constructs a view and associates it with its controller
+     */
     static Component create(OutputModel outputModel) {
-        final JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         outputModel.addStartListener(new StartListener(panel));
         return panel;
     }
@@ -49,9 +48,8 @@ class PracticeTrackView {
         public void accept(ParsedSequence sequence) {
             panel.removeAll();
             panel.add(new JLabel("Tracks:"));
-            sequence.getTracks().stream().filter(CONTAINS_NOTES).forEach(track -> {
-                panel.add(createButton(sequence, track));
-            });
+            sequence.getTracks().stream().filter(CONTAINS_NOTES)
+                    .forEach(track -> panel.add(createButton(sequence, track)));
             panel.revalidate();
         }
 
@@ -60,17 +58,8 @@ class PracticeTrackView {
             button.setMargin(new Insets(8, 8, 8, 8));
             button.addItemListener(e -> sequence.setTrackActive(track, e.getStateChange() == ItemEvent.SELECTED));
             button.setSelected(sequence.getActiveTracks().contains(track));
-            button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    sequence.setTrackActive(track, !button.isSelected());
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    sequence.setTrackActive(track, button.isSelected());
-                }
-            });
+            button.addMouseListener(new ToggleListener(toggle -> sequence.setTrackActive(track, button.isSelected()
+                    ^ toggle)));
             return button;
         }
     }
