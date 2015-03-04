@@ -1,9 +1,14 @@
 package net.kreatious.pianoleopard.keyboardselect;
 
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -93,6 +98,51 @@ public class SelectKeyboardDialogTest {
         assertThat(dialog.getDialog().isValid(), is(false));
     }
 
+    /**
+     * Tests that the keyboard dialog refreshes its device lists when shown
+     */
+    @Test
+    public void testShowDialogRefreshes() {
+        testShowDialogRefreshes(defaultReceiver, Devices::addReceiver);
+        testShowDialogRefreshes(defaultTransmitter, Devices::addTransmitter);
+    }
+
+    private void testShowDialogRefreshes(MidiDevice device, BiFunction<Devices, String, MidiDevice> addDevice) {
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+
+        final MidiDevice addedDevice = addDevice.apply(devices, "new device");
+        final JComboBox<?> combobox = getComboBoxWithDevice(dialog, device);
+        assertThat(getDevices(combobox), not(hasItem(addedDevice)));
+        dialog.showDialog(Optional.empty());
+        assertThat(getDevices(combobox), hasItem(addedDevice));
+
+        getButtonWithText(dialog, "Cancel").doClick();
+        assertThat(dialog.getDialog().isValid(), is(false));
+    }
+
+    /**
+     * Tests that the keyboard dialog refreshes its device lists when the
+     * refresh button is selected
+     */
+    @Test
+    public void testRefresh() {
+        testRefresh(defaultReceiver, Devices::addReceiver);
+        testRefresh(defaultTransmitter, Devices::addTransmitter);
+    }
+
+    private void testRefresh(MidiDevice device, BiFunction<Devices, String, MidiDevice> addDevice) {
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+
+        final MidiDevice addedDevice = addDevice.apply(devices, "new device");
+        final JComboBox<?> combobox = getComboBoxWithDevice(dialog, device);
+        assertThat(getDevices(combobox), not(hasItem(addedDevice)));
+        getButtonWithText(dialog, "Refresh").doClick();
+        assertThat(getDevices(combobox), hasItem(addedDevice));
+
+        getButtonWithText(dialog, "Cancel").doClick();
+        assertThat(dialog.getDialog().isValid(), is(false));
+    }
+
     private static JButton getButtonWithText(SelectKeyboardDialog dialog, String text) {
         return Stream.of(dialog.getDialog().getContentPane().getComponents())
                 .filter(component -> component instanceof JButton).map(component -> (JButton) component)
@@ -104,11 +154,11 @@ public class SelectKeyboardDialogTest {
                 .filter(component -> component instanceof JPanel).map(component -> (JPanel) component)
                 .flatMap(panel -> Stream.of(panel.getComponents()))
                 .filter(component -> component instanceof JComboBox<?>).map(component -> (JComboBox<?>) component)
-                .filter(comboBox -> comboBoxContainsDevice(comboBox, device)).findFirst().get();
+                .filter(comboBox -> getDevices(comboBox).contains(device)).findFirst().get();
     }
 
-    private static boolean comboBoxContainsDevice(JComboBox<?> keyboards, MidiDevice device) {
+    private static List<MidiDevice> getDevices(JComboBox<?> keyboards) {
         return IntStream.range(0, keyboards.getItemCount()).mapToObj(keyboards::getItemAt)
-                .anyMatch(deviceRow -> ((DeviceRow) deviceRow).getDevice().equals(device));
+                .map(deviceRow -> ((DeviceRow) deviceRow).getDevice()).collect(toList());
     }
 }

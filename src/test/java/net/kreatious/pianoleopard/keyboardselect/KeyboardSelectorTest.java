@@ -90,4 +90,19 @@ public class KeyboardSelectorTest {
         selector.setSelectedDevice(unlimitedTransmitter);
         assertThat(selector.getSelectedDevice().get(), is(receiver));
     }
+
+    /**
+     * Tests that newly added devices are displayed
+     */
+    @Test
+    public void testRefreshDevice() {
+        final KeyboardSelector selector = new KeyboardSelector("Output:", x -> x.getMaxReceivers() != 0, devices);
+        assertThat(selector.getDisplayedDevices(), is(arrayContaining(receiver, unlimitedReceiver)));
+
+        final MidiDevice newReceiver = devices.addReceiver("Newly Added Receiver");
+        assertThat(selector.getDisplayedDevices(), is(arrayContaining(receiver, unlimitedReceiver)));
+
+        selector.reloadDevices();
+        assertThat(selector.getDisplayedDevices(), is(arrayContaining(receiver, unlimitedReceiver, newReceiver)));
+    }
 }

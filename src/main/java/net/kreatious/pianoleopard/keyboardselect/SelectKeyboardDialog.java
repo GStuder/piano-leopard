@@ -2,7 +2,7 @@ package net.kreatious.pianoleopard.keyboardselect;
 
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
-import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.util.Optional;
 
 import javax.swing.JButton;
@@ -39,19 +39,18 @@ public class SelectKeyboardDialog {
     public SelectKeyboardDialog(Optional<Keyboard> keyboard, MidiDeviceFactory deviceFactory) {
         this.keyboard = keyboard;
         dialog = new JDialog();
-        dialog.setModalityType(ModalityType.TOOLKIT_MODAL);
-        dialog.setIconImage(Toolkit.getDefaultToolkit().getImage(
-                SelectKeyboardDialog.class.getResource("/keyboard_configuration.png")));
+        dialog.setResizable(false);
+        dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
         dialog.setTitle("MIDI Keyboard Selection");
-        dialog.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,
-                FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, },
-                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, }));
+        dialog.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,
+                FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC,
+                FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,
+                FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, }));
 
-        dialog.add(new JLabel("Select which MIDI keyboard to use"), "2, 2, 5, 1");
+        dialog.add(new JLabel("Select which MIDI keyboard to use"), "2, 2, 7, 1");
 
         input = new KeyboardSelector("Input:", device -> device.getMaxTransmitters() != 0, deviceFactory);
         keyboard.map(Keyboard::getInput).ifPresent(input::setSelectedDevice);
@@ -64,14 +63,19 @@ public class SelectKeyboardDialog {
         final JButton btnOk = new JButton("OK");
         btnOk.addActionListener(event -> apply());
         btnOk.addActionListener(event -> dialog.dispose());
-        dialog.add(btnOk, "4, 8");
+        dialog.add(btnOk, "6, 8");
+
+        final JButton btnRefresh = new JButton("Refresh");
+        btnRefresh.setMnemonic(KeyEvent.VK_R);
+        btnRefresh.addActionListener(event -> input.reloadDevices());
+        btnRefresh.addActionListener(event -> output.reloadDevices());
+        dialog.add(btnRefresh, "2, 8");
 
         final JButton btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(event -> dialog.dispose());
-        dialog.add(btnCancel, "6, 8");
+        dialog.add(btnCancel, "8, 8");
 
         dialog.pack();
-        dialog.setMinimumSize(dialog.getSize());
     }
 
     private void apply() {
@@ -89,6 +93,9 @@ public class SelectKeyboardDialog {
     /**
      * Shows the select keyboard dialog. This method blocks until a keyboard has
      * been selected.
+     * <p>
+     * If a parent is not provided, the dialog will not be shown and this method
+     * returns immediately.
      *
      * @param parent
      *            the parent component to layout this dialog relative to
@@ -98,7 +105,9 @@ public class SelectKeyboardDialog {
         parent.ifPresent(dialog::setLocationRelativeTo);
 
         final Optional<Keyboard> oldKeyboard = keyboard;
-        dialog.setVisible(true);
+        input.reloadDevices();
+        output.reloadDevices();
+        dialog.setVisible(parent.isPresent());
         return oldKeyboard.equals(keyboard) ? Optional.empty() : keyboard;
     }
 

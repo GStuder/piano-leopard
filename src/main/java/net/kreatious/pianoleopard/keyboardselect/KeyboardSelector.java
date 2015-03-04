@@ -62,6 +62,8 @@ class KeyboardSelector {
 
     private final JComboBox<DeviceRow> keyboards = new JComboBox<>();
     private final JPanel panel = new JPanel();
+    private final Predicate<? super MidiDevice> filter;
+    private final MidiDeviceFactory deviceFactory;
 
     /**
      * Constructs a new {@link KeyboardSelector} with the specified label and
@@ -79,13 +81,16 @@ class KeyboardSelector {
      *            devices
      */
     KeyboardSelector(String label, Predicate<? super MidiDevice> filter, MidiDeviceFactory deviceFactory) {
+        this.filter = filter;
+        this.deviceFactory = deviceFactory;
+
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.BUTTON_COLSPEC,
                 FormFactory.LABEL_COMPONENT_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, }));
         panel.add(new JLabel(label), "1, 1, right, default");
         panel.add(keyboards, "3, 1, fill, default");
 
-        Stream.of(deviceFactory.getMidiDevices()).filter(filter).map(DeviceRow::new).forEach(keyboards::addItem);
+        reloadDevices();
     }
 
     /**
@@ -108,6 +113,14 @@ class KeyboardSelector {
      */
     void setSelectedDevice(MidiDevice device) {
         keyboards.setSelectedItem(new DeviceRow(device));
+    }
+
+    /**
+     * Reloads the MIDI devices displayed by this control
+     */
+    void reloadDevices() {
+        keyboards.removeAllItems();
+        Stream.of(deviceFactory.getMidiDevices()).filter(filter).map(DeviceRow::new).forEach(keyboards::addItem);
     }
 
     /**
