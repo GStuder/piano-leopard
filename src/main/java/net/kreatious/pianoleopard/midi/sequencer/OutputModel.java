@@ -121,23 +121,6 @@ public class OutputModel implements AutoCloseable {
         sequencer.start();
     }
 
-    /**
-     * Parses a MIDI file and prepares it for playback.
-     * <p>
-     * Any registered start listeners will be called with the parsed sequence.
-     * The file of the parsed sequence will be the specified MIDI file.
-     *
-     * @param midi
-     *            the MIDI file to open
-     * @throws IOException
-     *             if an I/O error occurs
-     */
-    public void openMidiFile(File midi) throws IOException {
-        try (InputStream in = new FileInputStream(midi)) {
-            openMidiFile(in, Optional.of(midi));
-        }
-    }
-
     private class MutingReceiverProxy implements Receiver {
         private final long tolerance = TimeUnit.SECONDS.toMicros(2);
         private final Receiver wrapped;
@@ -190,6 +173,23 @@ public class OutputModel implements AutoCloseable {
         @Override
         public void close() {
             wrapped.close();
+        }
+    }
+
+    /**
+     * Parses a MIDI file and prepares it for playback.
+     * <p>
+     * Any registered start listeners will be called with the parsed sequence.
+     * The file of the parsed sequence will be the specified MIDI file.
+     *
+     * @param midi
+     *            the MIDI file to open
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    public void openMidiFile(File midi) throws IOException {
+        try (InputStream in = new FileInputStream(midi)) {
+            openMidiFile(in, Optional.of(midi));
         }
     }
 
@@ -278,7 +278,7 @@ public class OutputModel implements AutoCloseable {
             }
         } catch (final InvalidMidiDataException e) {
             // Unreachable
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
     }
 }
