@@ -119,8 +119,10 @@ class KeyboardSelector {
      * Reloads the MIDI devices displayed by this control
      */
     void reloadDevices() {
+        final Optional<MidiDevice> selectedDevice = getSelectedDevice();
         keyboards.removeAllItems();
         Stream.of(deviceFactory.getMidiDevices()).filter(filter).map(DeviceRow::new).forEach(keyboards::addItem);
+        selectedDevice.ifPresent(this::setSelectedDevice);
     }
 
     /**

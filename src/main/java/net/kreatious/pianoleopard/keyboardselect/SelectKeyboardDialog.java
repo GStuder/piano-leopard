@@ -54,11 +54,11 @@ public class SelectKeyboardDialog {
 
         input = new KeyboardSelector("Input:", device -> device.getMaxTransmitters() != 0, deviceFactory);
         keyboard.map(Keyboard::getInput).ifPresent(input::setSelectedDevice);
-        dialog.add(input.getPanel(), "2, 4, 5, 1");
+        dialog.add(input.getPanel(), "2, 4, 7, 1");
 
         output = new KeyboardSelector("Output:", device -> device.getMaxReceivers() != 0, deviceFactory);
         keyboard.map(Keyboard::getOutput).ifPresent(output::setSelectedDevice);
-        dialog.add(output.getPanel(), "2, 6, 5, 1");
+        dialog.add(output.getPanel(), "2, 6, 7, 1");
 
         final JButton btnOk = new JButton("OK");
         btnOk.addActionListener(event -> apply());

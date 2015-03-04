@@ -97,6 +97,7 @@ public class KeyboardSelectorTest {
     @Test
     public void testRefreshDevice() {
         final KeyboardSelector selector = new KeyboardSelector("Output:", x -> x.getMaxReceivers() != 0, devices);
+        selector.setSelectedDevice(unlimitedReceiver);
         assertThat(selector.getDisplayedDevices(), is(arrayContaining(receiver, unlimitedReceiver)));
 
         final MidiDevice newReceiver = devices.addReceiver("Newly Added Receiver");
@@ -104,5 +105,6 @@ public class KeyboardSelectorTest {
 
         selector.reloadDevices();
         assertThat(selector.getDisplayedDevices(), is(arrayContaining(receiver, unlimitedReceiver, newReceiver)));
+        assertThat(selector.getSelectedDevice().get(), is(unlimitedReceiver));
     }
 }
