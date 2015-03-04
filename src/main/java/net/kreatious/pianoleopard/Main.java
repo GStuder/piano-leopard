@@ -55,6 +55,7 @@ public class Main {
 
     private static JFrame create(OutputModel outputModel, InputModel inputModel) {
         LightedKeyboardController.create(outputModel, inputModel);
+        AntiIdle.create(inputModel);
 
         final Preferences preferences = Preferences.userNodeForPackage(Main.class);
         final JFrame frame = new JFrame();
