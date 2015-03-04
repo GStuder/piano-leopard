@@ -36,6 +36,7 @@ public class InputModel implements AutoCloseable, ParsedTrack {
     private final IntervalSet<Long, EventPair<PedalEvent>> pedals = new IntervalSet<>();
 
     private final List<Consumer<? super Info>> inputDeviceListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<? super Event>> inputListeners = new CopyOnWriteArrayList<>();
 
     private InputModel(MidiDevice input) throws MidiUnavailableException {
         setInputDevice(input);
@@ -86,6 +87,7 @@ public class InputModel implements AutoCloseable, ParsedTrack {
             } else if (event instanceof PedalEvent) {
                 userPressedEvent((PedalEvent) event, onPedals, pedals);
             }
+            inputListeners.forEach(listener -> listener.accept(event));
         }
 
         private <K extends Event> void userPressedEvent(K event, Map<Object, K> onEvents,
@@ -165,6 +167,16 @@ public class InputModel implements AutoCloseable, ParsedTrack {
      */
     public void addInputDeviceListener(Consumer<? super Info> listener) {
         inputDeviceListeners.add(listener);
+    }
+
+    /**
+     * Adds a listener to notify when the user has pressed a key
+     *
+     * @param listener
+     *            the listener to add
+     */
+    public void addInputListener(Consumer<? super Event> listener) {
+        inputListeners.add(listener);
     }
 
     @Override
