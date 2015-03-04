@@ -5,7 +5,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
-import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -39,7 +38,9 @@ public class Main {
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
 
-            final JFrame applet = create();
+            final OutputModel outputModel = new OutputModel(new SystemSequencerFactory());
+            final InputModel inputModel = InputModel.create(outputModel);
+            final JFrame applet = create(outputModel, inputModel);
             applet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             applet.setIconImage(Toolkit.getDefaultToolkit().getImage(
                     SelectKeyboardDialog.class.getResource("/application_lightning.png")));
@@ -52,22 +53,22 @@ public class Main {
         }
     }
 
-    private static JFrame create() throws MidiUnavailableException {
-        final OutputModel outputModel = new OutputModel(new SystemSequencerFactory());
-        final InputModel inputModel = InputModel.create(outputModel);
-        final Preferences preferences = Preferences.userNodeForPackage(Main.class);
+    private static JFrame create(OutputModel outputModel, InputModel inputModel) {
         LightedKeyboardController.create(outputModel);
 
+        final Preferences preferences = Preferences.userNodeForPackage(Main.class);
         final JFrame frame = new JFrame();
         frame.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                 FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                 FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow") },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("fill:default:grow") }));
-        frame.add(PlayAction.create(outputModel), "6, 2");
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        RowSpec.decode("fill:default:grow") }));
+        frame.add(PracticeAction.create(outputModel), "6, 2");
         frame.add(OpenAction.create(frame, preferences, outputModel), "4, 2");
         frame.add(KeyboardAction.create(frame, preferences, outputModel, inputModel), "2, 2");
-        frame.add(PainterPanel.create(outputModel, inputModel), "1, 4, 8, 1, fill, fill");
+        frame.add(PracticeTrackView.create(outputModel), "2, 4, 7, 1");
+        frame.add(PainterPanel.create(outputModel, inputModel), "1, 5, 8, 1, fill, fill");
         frame.pack();
         frame.addWindowListener(new WindowAdapter() {
             @Override

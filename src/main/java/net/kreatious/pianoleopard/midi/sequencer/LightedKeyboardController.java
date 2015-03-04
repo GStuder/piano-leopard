@@ -1,6 +1,5 @@
 package net.kreatious.pianoleopard.midi.sequencer;
 
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -22,8 +21,8 @@ import net.kreatious.pianoleopard.midi.sequencer.Keys.KeyIterator;
  */
 public class LightedKeyboardController {
     private static final long OFFSET = TimeUnit.MILLISECONDS.toMicros(500);
-    private static final long GAP_BETWEEN_NOTES = TimeUnit.MILLISECONDS.toMicros(100);
-    private static final int NAVIGATION_CHANNEL = 15;
+    private static final long NOTE_GAP = TimeUnit.MILLISECONDS.toMicros(50);
+    private static final int NAVIGATION_CHANNEL = 3;
 
     private final OutputModel outputModel;
     private final Keys litKeys = new Keys();
@@ -66,16 +65,14 @@ public class LightedKeyboardController {
     }
 
     private void updateKeysToLight(long time) {
-        final long offsetTime = time + OFFSET;
-        for (final ParsedTrack track : sequence.getTracks()) {
-            final Iterator<EventPair<NoteEvent>> it = track.getNotePairs(offsetTime, offsetTime).iterator();
-            while (it.hasNext()) {
-                final EventPair<NoteEvent> note = it.next();
-
-                // Filter out lit keys based on certain criteria
+        final long timePlusOffset = time + OFFSET;
+        for (final ParsedTrack track : sequence.getActiveTracks()) {
+            for (final EventPair<NoteEvent> note : track.getNotePairs(timePlusOffset - NOTE_GAP, timePlusOffset)) {
                 if (note.getDuration() <= TimeUnit.MILLISECONDS.toMicros(10)) {
+                    // Note too short
                     continue;
-                } else if (offsetTime >= note.getOffTime() - GAP_BETWEEN_NOTES) {
+                } else if (timePlusOffset >= note.getOffTime() - NOTE_GAP) {
+                    // Force a gap between notes
                     continue;
                 }
 

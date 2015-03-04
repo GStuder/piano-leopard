@@ -3,6 +3,8 @@ package net.kreatious.pianoleopard.midi.event;
 /**
  * Represents a slot that uniquely identifies which interval events within the
  * same channel belong to. Intended to be used as a key for maps.
+ * <p>
+ * A slot contains a channel and a key.
  *
  * @author Jay-R Studer
  */

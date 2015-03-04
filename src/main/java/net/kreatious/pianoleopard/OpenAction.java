@@ -41,7 +41,7 @@ class OpenAction extends AbstractAction {
         chooser.setPreferredSize(new Dimension(600, 400));
     }
 
-    static JButton create(Component parent, Preferences preferences, OutputModel outputModel) {
+    static Component create(Component parent, Preferences preferences, OutputModel outputModel) {
         final Action action = new OpenAction(parent, preferences, outputModel);
         action.putValue(NAME, "Open...");
         action.setEnabled(false);

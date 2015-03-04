@@ -3,9 +3,11 @@ package net.kreatious.pianoleopard.midi;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -18,7 +20,9 @@ import javax.sound.midi.Track;
  * @author Jay-R Studer
  */
 public class ParsedSequence {
-    private final List<ParsedTrack> parsedTracks;
+    private final List<ParsedTrack> inactiveTracks = new CopyOnWriteArrayList<>();
+    private final List<ParsedTrack> activeTracks = new CopyOnWriteArrayList<>();
+    private final List<ParsedTrack> tracks;
     private final Sequence sequence;
 
     /**
@@ -29,8 +33,8 @@ public class ParsedSequence {
 
     private ParsedSequence(Sequence sequence, Track[] tracks, TempoCache cache) {
         this.sequence = sequence;
-        parsedTracks = Collections.unmodifiableList(Stream.of(tracks)
-                .map(track -> new ImmutableParsedTrack(track, cache)).collect(toList()));
+        this.tracks = Stream.of(tracks).map(track -> new ImmutableParsedTrack(track, cache)).collect(toList());
+        activeTracks.addAll(this.tracks);
     }
 
     /**
@@ -65,12 +69,62 @@ public class ParsedSequence {
     }
 
     /**
-     * Gets the tracks stored by this parsed MIDI sequence.
+     * Gets all tracks stored by this parsed MIDI sequence.
      *
-     * @return a read only view of the parsed tracks contained in this sequence
+     * @return a read only view of all parsed tracks contained in this sequence
      */
     public List<ParsedTrack> getTracks() {
-        return parsedTracks;
+        return Collections.unmodifiableList(tracks);
+    }
+
+    /**
+     * Gets the active tracks stored by this parsed MIDI sequence.
+     * <p>
+     * Active tracks are those selected by the user for practice.
+     *
+     * @return a read only unordered view of the active parsed tracks contained
+     *         in this sequence
+     */
+    public Collection<ParsedTrack> getActiveTracks() {
+        return Collections.unmodifiableCollection(activeTracks);
+    }
+
+    /**
+     * Gets the inactive tracks stored by this parsed MIDI sequence.
+     * <p>
+     * Inactive tracks are those not selected by the user for practice.
+     *
+     * @return a read only unordered view of the inactive parsed tracks
+     *         contained in this sequence
+     */
+    public Collection<ParsedTrack> getInactiveTracks() {
+        return Collections.unmodifiableCollection(inactiveTracks);
+    }
+
+    /**
+     * Sets the specified track as active.
+     * <p>
+     * If the track is already active, no changes occur.
+     *
+     * @param track
+     *            the parsed track in this sequence to modify
+     * @param active
+     *            true if the track should be active, otherwise false
+     * @throws IllegalArgumentException
+     *             if the track is not contained in this sequence
+     */
+    public void setTrackActive(ParsedTrack track, boolean active) {
+        if (!tracks.contains(track)) {
+            throw new IllegalArgumentException("Specified track is not contained by this container.");
+        }
+
+        if (active && inactiveTracks.contains(track)) {
+            inactiveTracks.remove(track);
+            activeTracks.add(track);
+        } else if (!active && activeTracks.contains(track)) {
+            activeTracks.remove(track);
+            inactiveTracks.add(track);
+        }
     }
 
     /**

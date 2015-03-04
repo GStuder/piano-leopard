@@ -1,5 +1,6 @@
 package net.kreatious.pianoleopard;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -10,22 +11,22 @@ import net.kreatious.pianoleopard.midi.ParsedSequence;
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
 /**
- * Provides the action for the play button.
+ * Provides the action for the practice button.
  *
  * @author Jay-R Studer
  */
-class PlayAction extends AbstractAction {
+class PracticeAction extends AbstractAction {
     private static final long serialVersionUID = 710373445454665603L;
     private final OutputModel outputModel;
 
-    private PlayAction(OutputModel outputModel) {
+    private PracticeAction(OutputModel outputModel) {
         this.outputModel = outputModel;
     }
 
-    static JButton create(OutputModel outputModel) {
-        final PlayAction action = new PlayAction(outputModel);
+    static Component create(OutputModel outputModel) {
+        final PracticeAction action = new PracticeAction(outputModel);
         outputModel.addStartListener(action::setCurrentSequence);
-        action.putValue(NAME, "Play");
+        action.putValue(NAME, "Practice");
         action.setEnabled(false);
         return new JButton(action);
     }
@@ -36,7 +37,7 @@ class PlayAction extends AbstractAction {
     }
 
     private void setCurrentSequence(ParsedSequence sequence) {
-        putValue(NAME, "Play" + sequence.getFile().map(File::getName).map(name -> " " + name).orElse(""));
+        putValue(NAME, "Practice" + sequence.getFile().map(File::getName).map(name -> " " + name).orElse(""));
         setEnabled(true);
     }
 }

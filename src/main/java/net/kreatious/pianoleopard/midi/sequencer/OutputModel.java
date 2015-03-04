@@ -23,6 +23,13 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 
 import net.kreatious.pianoleopard.midi.ParsedSequence;
+import net.kreatious.pianoleopard.midi.ParsedTrack;
+import net.kreatious.pianoleopard.midi.event.Event;
+import net.kreatious.pianoleopard.midi.event.EventFactory;
+import net.kreatious.pianoleopard.midi.event.EventPair;
+import net.kreatious.pianoleopard.midi.event.NoteEvent;
+import net.kreatious.pianoleopard.midi.event.PedalEvent;
+import net.kreatious.pianoleopard.midi.event.Slot;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -32,6 +39,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Jay-R Studer
  */
 public class OutputModel implements AutoCloseable {
+    private static final long ALWAYS_SEND = -10;
     private final Sequencer sequencer;
     private ParsedSequence sequence = ParsedSequence.createEmpty();
     private Optional<MidiDevice> output = Optional.empty();
@@ -88,7 +96,7 @@ public class OutputModel implements AutoCloseable {
             this.output = Optional.of(output);
 
             output.open();
-            receiver = Optional.of(output.getReceiver());
+            receiver = Optional.of(new MutingReceiverProxy(output.getReceiver()));
             sequencer.getTransmitter().setReceiver(receiver.get());
             sequencer.open();
             sequencer.setSequence(sequence.getSequence());
@@ -127,6 +135,61 @@ public class OutputModel implements AutoCloseable {
     public void openMidiFile(File midi) throws IOException {
         try (InputStream in = new FileInputStream(midi)) {
             openMidiFile(in, Optional.of(midi));
+        }
+    }
+
+    private class MutingReceiverProxy implements Receiver {
+        private final long tolerance = TimeUnit.SECONDS.toMicros(2);
+        private final Receiver wrapped;
+
+        private MutingReceiverProxy(Receiver wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public void send(MidiMessage message, long timeStamp) {
+            if (timeStamp == ALWAYS_SEND) {
+                wrapped.send(message, -1);
+            } else if (message instanceof ShortMessage == false) {
+                wrapped.send(message, timeStamp);
+            } else if (EventFactory.create(message, sequencer.getMicrosecondPosition()).filter(this::isMuted)
+                    .isPresent() == false) {
+                wrapped.send(message, timeStamp);
+            }
+        }
+
+        /**
+         * An event is considered muted if its {@link Slot} is not found in any
+         * inactive tracks at the current time.
+         */
+        private boolean isMuted(Event event) {
+            // Never mute a note off event
+            if (!event.isOn()) {
+                return false;
+            }
+
+            for (final ParsedTrack track : sequence.getInactiveTracks()) {
+                final Iterable<? extends EventPair<? extends Event>> pairs;
+                if (event instanceof NoteEvent) {
+                    pairs = track.getNotePairs(event.getTime(), event.getTime() + tolerance);
+                } else if (event instanceof PedalEvent) {
+                    pairs = track.getPedalPairs(event.getTime(), event.getTime() + tolerance);
+                } else {
+                    return false;
+                }
+
+                for (final EventPair<? extends Event> pair : pairs) {
+                    if (pair.getSlot().equals(event.getSlot())) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public void close() {
+            wrapped.close();
         }
     }
 
@@ -192,7 +255,7 @@ public class OutputModel implements AutoCloseable {
      *            the MIDI message to send to the connected output device
      */
     public synchronized void sendMessage(MidiMessage message) {
-        receiver.ifPresent(receive -> receive.send(message, -1));
+        receiver.ifPresent(receive -> receive.send(message, ALWAYS_SEND));
     }
 
     @Override
@@ -209,9 +272,9 @@ public class OutputModel implements AutoCloseable {
         try {
             for (int channel = 0; channel != 16; channel++) {
                 // All notes off, reset all controllers, reset programs
-                receiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 123, 0), -1);
-                receiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 121, 0), -1);
-                receiver.send(new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, 0, 0), -1);
+                receiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 123, 0), ALWAYS_SEND);
+                receiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 121, 0), ALWAYS_SEND);
+                receiver.send(new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, 0, 0), ALWAYS_SEND);
             }
         } catch (final InvalidMidiDataException e) {
             // Unreachable

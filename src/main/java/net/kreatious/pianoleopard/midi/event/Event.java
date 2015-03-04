@@ -74,8 +74,9 @@ public abstract class Event {
     public abstract boolean isOn();
 
     /**
-     * Gets a slot that uniquely identifies which interval events within the
-     * same channel belong to.
+     * Gets a slot that uniquely identifies which interval events belong to.
+     * <p>
+     * Equal slots are events occurring for the same channel and key.
      *
      * @return a uniquely identifying slot for this event
      */

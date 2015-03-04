@@ -26,12 +26,14 @@ public class EventPair<T extends Event> {
             throw new IllegalArgumentException("on (" + on + ") was off");
         } else if (off.isOn()) {
             throw new IllegalArgumentException("off (" + off + ") was on");
-        } else if (on.getTime() > off.getTime()) {
-            throw new IllegalArgumentException("on (" + on + ") was after off (" + off + ")");
         } else if (on.getChannel() != off.getChannel()) {
             throw new IllegalArgumentException("on (" + on + ") is not on the same channel as off (" + off + ")");
         } else if (!on.getSlot().equals(off.getSlot())) {
             throw new IllegalArgumentException("on (" + on + ") is not on the same slot as off (" + off + ")");
+        } else if (on.getTime() > off.getTime()) {
+            this.on = on;
+            this.off = on.createOff(on.getTime());
+            return;
         }
 
         this.on = on;

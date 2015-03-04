@@ -15,20 +15,23 @@ import java.util.function.Predicate;
 class RangeIterator<K extends Comparable<K>, V> implements Iterator<V> {
     private final IntervalSet<K, V> set;
     private final int expectedModifications;
-    private final Interval<K> range;
 
     // Cached to avoid unnecessary object allocation in next()
-    private final Predicate<Entry<K, V>> withinResult = c -> c.getKey().containsInterval(range);
-    private final Predicate<Entry<K, V>> maximumIsAfterRangeStart = c -> c.getMaximum().compareTo(range.getLow()) >= 0;
-    private final Predicate<Entry<K, V>> lowIsBeforeRangeEnd = c -> c.getKey().getLow().compareTo(range.getHigh()) <= 0;
-    private final Predicate<Entry<K, V>> lowBeforeEndWithinResult = lowIsBeforeRangeEnd.and(withinResult.negate());
+    private final Predicate<Entry<K, V>> withinResult;
+    private final Predicate<Entry<K, V>> maximumIsAfterRangeStart;
+    private final Predicate<Entry<K, V>> lowIsBeforeRangeEnd;
+    private final Predicate<Entry<K, V>> lowBeforeEndWithinResult;
 
     private Optional<Entry<K, V>> next;
     private Optional<Iterator<V>> subiterator;
 
     RangeIterator(IntervalSet<K, V> set, Interval<K> range, Optional<Entry<K, V>> first) {
         this.set = set;
-        this.range = range;
+        withinResult = c -> c.getKey().containsInterval(range);
+        maximumIsAfterRangeStart = c -> c.getMaximum().compareTo(range.getLow()) >= 0;
+        lowIsBeforeRangeEnd = c -> c.getKey().getLow().compareTo(range.getHigh()) <= 0;
+        lowBeforeEndWithinResult = lowIsBeforeRangeEnd.and(withinResult.negate());
+
         expectedModifications = set.getModifications();
         next = first;
         subiterator = first.map(Entry::getValues).map(Set::iterator);

@@ -10,6 +10,7 @@ import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
 import net.kreatious.pianoleopard.painter.layout.DefaultEventLayout;
 import net.kreatious.pianoleopard.painter.layout.EventLayout;
+import net.kreatious.pianoleopard.painter.layout.InactiveEventLayout;
 import net.kreatious.pianoleopard.painter.layout.PlayedEventLayout;
 
 /**
@@ -61,6 +62,18 @@ class EventPainter {
      */
     Iterable<EventPair<PedalEvent>> getVisiblePedalPairs(ParsedTrack track, long currentTime) {
         return track.getPedalPairs(layout.getLowestVisibleTime(currentTime), layout.getHighestVisibleTime(currentTime));
+    }
+
+    /**
+     * Constructs a new event painter for painting inactive events.
+     *
+     * @param dimension
+     *            the initial component dimensions
+     * @return a new {@link EventPainter}
+     */
+    static EventPainter createInactiveEventPainter(Dimension dimension) {
+        return new EventPainter(new InactiveNoteStyleStrategy(), new InactivePedalStyleStrategy(),
+                new InactiveEventLayout(dimension));
     }
 
     /**

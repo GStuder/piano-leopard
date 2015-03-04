@@ -60,7 +60,7 @@ class KeyboardAction extends AbstractAction {
         return Optional.empty();
     }
 
-    static JButton create(Component parent, Preferences preferences, OutputModel outputModel, InputModel inputModel) {
+    static Component create(Component parent, Preferences preferences, OutputModel outputModel, InputModel inputModel) {
         outputModel.addOutputDeviceListener(info -> preferences.put(OUTPUT_PREFERENCE, info.getName()));
         inputModel.addInputDeviceListener(info -> preferences.put(INPUT_PREFERENCE, info.getName()));
 
