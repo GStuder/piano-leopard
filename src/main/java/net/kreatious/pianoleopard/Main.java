@@ -62,15 +62,16 @@ public class Main {
         frame.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                 FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                 FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,
-                FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow") }, new RowSpec[] {
-                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.MIN_ROWSPEC,
-                RowSpec.decode("fill:default:grow") }));
+                FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC,
+                FormFactory.DEFAULT_COLSPEC }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.MIN_ROWSPEC, RowSpec.decode("fill:default:grow") }));
+        frame.add(TempoController.create(outputModel), "12, 2, 1, 2, fill, top");
         frame.add(PlayAlongController.create(outputModel), "8, 2");
         frame.add(PracticeController.create(outputModel), "6, 2");
         frame.add(OpenController.create(frame, preferences, outputModel), "4, 2");
         frame.add(KeyboardController.create(frame, preferences, outputModel, inputModel), "2, 2");
-        frame.add(PracticeTrackController.create(outputModel), "2, 3, 9, 1");
-        frame.add(PainterPanel.create(outputModel, inputModel), "1, 4, 10, 1, fill, fill");
+        frame.add(PracticeTrackController.create(outputModel), "2, 3, 11, 1");
+        frame.add(PainterPanel.create(outputModel, inputModel), "1, 4, 12, 1, fill, fill");
         frame.pack();
         frame.addWindowListener(new WindowAdapter() {
             @Override

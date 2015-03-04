@@ -192,6 +192,21 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
+     * Adjusts the tempo of played back sequences.
+     * <p>
+     * Values higher than 1.0 are faster than normal, less than 1.0 are slower
+     * than normal. A value of 1.0 indicates that the regular tempo should be
+     * applied. Tempo factors do not affect the microsecond values of MIDI
+     * events.
+     *
+     * @param factor
+     *            the tempo factor to set
+     */
+    public void setTempoFactor(float factor) {
+        sequencer.setTempoFactor(factor);
+    }
+
+    /**
      * Parses a MIDI file and prepares it for playback.
      * <p>
      * Any registered start listeners will be called with the parsed sequence.
