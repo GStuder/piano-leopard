@@ -44,10 +44,12 @@ public class OutputModel implements AutoCloseable {
     private ParsedSequence sequence = ParsedSequence.createEmpty();
     private Optional<MidiDevice> output = Optional.empty();
     private Optional<Receiver> receiver = Optional.empty();
+    private boolean playAlong;
 
-    private final List<Consumer<? super ParsedSequence>> startListeners = new CopyOnWriteArrayList<>();
-    private final List<LongConsumer> currentTimeListeners = new CopyOnWriteArrayList<>();
     private final List<Consumer<? super Info>> outputDeviceListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<? super ParsedSequence>> startListeners = new CopyOnWriteArrayList<>();
+    private final List<Runnable> playListeners = new CopyOnWriteArrayList<>();
+    private final List<LongConsumer> currentTimeListeners = new CopyOnWriteArrayList<>();
 
     private final Thread tickThread = new Thread("output model current tick thread") {
         @Override
@@ -118,6 +120,7 @@ public class OutputModel implements AutoCloseable {
         sequencer.setMicrosecondPosition(0);
         receiver.ifPresent(OutputModel::resetReceiver);
         startListeners.forEach(listener -> listener.accept(sequence));
+        playListeners.forEach(Runnable::run);
         sequencer.start();
     }
 
@@ -149,6 +152,8 @@ public class OutputModel implements AutoCloseable {
             // Never mute a note off event
             if (!event.isOn()) {
                 return false;
+            } else if (playAlong) {
+                return false;
             }
 
             for (final ParsedTrack track : sequence.getInactiveTracks()) {
@@ -174,6 +179,16 @@ public class OutputModel implements AutoCloseable {
         public void close() {
             wrapped.close();
         }
+    }
+
+    /**
+     * Sets if active tracks are not muted.
+     *
+     * @param playAlong
+     *            true if tracks are not to be muted, otherwise false.
+     */
+    public void setPlayAlong(boolean playAlong) {
+        this.playAlong = playAlong;
     }
 
     /**
@@ -213,6 +228,16 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
+     * Adds a listener to notify when the output device has changed.
+     *
+     * @param listener
+     *            the listener to add
+     */
+    public void addOutputDeviceListener(Consumer<? super Info> listener) {
+        outputDeviceListeners.add(listener);
+    }
+
+    /**
      * Adds a listener to notify when a parsed MIDI file is started from the
      * beginning.
      *
@@ -221,6 +246,17 @@ public class OutputModel implements AutoCloseable {
      */
     public void addStartListener(Consumer<? super ParsedSequence> listener) {
         startListeners.add(listener);
+    }
+
+    /**
+     * Adds a listener to notify when a parsed MIDI file is started from the
+     * beginning.
+     *
+     * @param listener
+     *            the listener to add
+     */
+    public void addPlayListener(Runnable listener) {
+        playListeners.add(listener);
     }
 
     /**
@@ -236,16 +272,6 @@ public class OutputModel implements AutoCloseable {
      */
     public void addCurrentTimeListener(LongConsumer listener) {
         currentTimeListeners.add(listener);
-    }
-
-    /**
-     * Adds a listener to notify when the output device has changed.
-     *
-     * @param listener
-     *            the listener to add
-     */
-    public void addOutputDeviceListener(Consumer<? super Info> listener) {
-        outputDeviceListeners.add(listener);
     }
 
     /**

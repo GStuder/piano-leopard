@@ -1,6 +1,5 @@
 package net.kreatious.pianoleopard;
 
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -8,7 +7,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
@@ -62,19 +60,17 @@ public class Main {
         final Preferences preferences = Preferences.userNodeForPackage(Main.class);
         final JFrame frame = new JFrame();
         frame.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-                FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow") },
-                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.MIN_ROWSPEC,
-                        RowSpec.decode("fill:default:grow") }));
+                FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,
+                FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow") }, new RowSpec[] {
+                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.MIN_ROWSPEC,
+                RowSpec.decode("fill:default:grow") }));
+        frame.add(PlayAlongController.create(outputModel), "8, 2");
         frame.add(PracticeController.create(outputModel), "6, 2");
         frame.add(OpenController.create(frame, preferences, outputModel), "4, 2");
         frame.add(KeyboardController.create(frame, preferences, outputModel, inputModel), "2, 2");
-
-        final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.add(PracticeTrackController.create(outputModel));
-        panel.add(PlayAlongController.create(outputModel));
-        frame.add(panel, "2, 3, 7, 1");
-        frame.add(PainterPanel.create(outputModel, inputModel), "1, 4, 8, 1, fill, fill");
+        frame.add(PracticeTrackController.create(outputModel), "2, 3, 9, 1");
+        frame.add(PainterPanel.create(outputModel, inputModel), "1, 4, 10, 1, fill, fill");
         frame.pack();
         frame.addWindowListener(new WindowAdapter() {
             @Override
