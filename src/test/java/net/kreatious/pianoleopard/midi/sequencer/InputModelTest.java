@@ -40,7 +40,7 @@ public class InputModelTest {
     private final MidiDevice input = given(mock(MidiDevice.class).getTransmitter()).willReturn(transmitter).getMock();
 
     private final OutputModel outputModel = mock(OutputModel.class);
-    private final InputModel inputModel = InputModel.create(input, outputModel);
+    private final InputModel inputModel = InputModel.create(outputModel);
     private final Receiver receiver;
 
     private long currentTime;
@@ -54,6 +54,8 @@ public class InputModelTest {
      *             exception is never thrown by this test.
      */
     public InputModelTest() throws MidiUnavailableException {
+        inputModel.setInputDevice(input);
+
         final ArgumentCaptor<Receiver> receiverCaptor = ArgumentCaptor.forClass(Receiver.class);
         then(transmitter).should().setReceiver(receiverCaptor.capture());
         receiver = receiverCaptor.getValue();

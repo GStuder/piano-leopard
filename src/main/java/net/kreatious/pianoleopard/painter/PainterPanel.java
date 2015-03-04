@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 
 import net.kreatious.pianoleopard.midi.ParsedSequence;
 import net.kreatious.pianoleopard.midi.ParsedTrack;
+import net.kreatious.pianoleopard.midi.sequencer.InputModel;
+import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
 /**
  * Renders the currently playing sequence into a panel using double buffering.
@@ -44,14 +46,28 @@ public class PainterPanel {
     private volatile ParsedSequence sequence = ParsedSequence.createEmpty();
 
     /**
+     * Constructor declared private to prevent direct instantiation by
+     * consumers.
+     */
+    private PainterPanel(ParsedTrack playedTrack) {
+        this.playedTrack = playedTrack;
+    }
+
+    /**
      * Constructs a new {@link PainterPanel} connected to the specified track
      * containing events played by the user
      *
-     * @param playedTrack
-     *            the track of events played by the user
+     * @param outputModel
+     *            the output model for events sent to the synthesizer
+     * @param inputModel
+     *            the input model for events played by the user
+     * @return a new instance of {@link PainterPanel}
      */
-    public PainterPanel(ParsedTrack playedTrack) {
-        this.playedTrack = playedTrack;
+    public static JPanel create(OutputModel outputModel, InputModel inputModel) {
+        final PainterPanel result = new PainterPanel(inputModel);
+        outputModel.addCurrentTimeListener(result::setCurrentTime);
+        outputModel.addStartListener(result::setCurrentSequence);
+        return result.getPanel();
     }
 
     /**
@@ -59,7 +75,7 @@ public class PainterPanel {
      *
      * @return the panel owned by this component
      */
-    public JPanel getPanel() {
+    private JPanel getPanel() {
         return panel;
     }
 
@@ -67,7 +83,7 @@ public class PainterPanel {
      * @param currentTime
      *            the current song time in microseconds
      */
-    public void setCurrentTime(long currentTime) {
+    private void setCurrentTime(long currentTime) {
         this.currentTime = currentTime;
         panel.repaint();
     }
@@ -78,7 +94,7 @@ public class PainterPanel {
      * @param sequence
      *            the parsed sequence to set
      */
-    public void setCurrentSequence(ParsedSequence sequence) {
+    private void setCurrentSequence(ParsedSequence sequence) {
         this.sequence = sequence;
     }
 }

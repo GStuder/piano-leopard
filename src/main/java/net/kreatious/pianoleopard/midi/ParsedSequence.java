@@ -2,8 +2,10 @@ package net.kreatious.pianoleopard.midi;
 
 import static java.util.stream.Collectors.toList;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -19,10 +21,47 @@ public class ParsedSequence {
     private final List<ParsedTrack> parsedTracks;
     private final Sequence sequence;
 
+    /**
+     * Originally set to null to signify that the value has not been set -- this
+     * is contrary to the normal expectations for an optional field
+     */
+    private Optional<File> file = null;
+
     private ParsedSequence(Sequence sequence, Track[] tracks, TempoCache cache) {
         this.sequence = sequence;
         parsedTracks = Collections.unmodifiableList(Stream.of(tracks)
                 .map(track -> new ImmutableParsedTrack(track, cache)).collect(toList()));
+    }
+
+    /**
+     * Gets the file that this sequence was originally created from.
+     * <p>
+     * If the returned file is not empty, subsequent calls to this function are
+     * guaranteed to return the same value.
+     *
+     * @return An optional containing the original file this sequence was
+     *         created with.
+     */
+    public Optional<File> getFile() {
+        return Optional.ofNullable(file).orElse(Optional.empty());
+    }
+
+    /**
+     * Sets the file that this sequence was originally created from.
+     * <p>
+     * This setter may only be called once per sequence. Subsequent calls will
+     * throw an exception.
+     *
+     * @param file
+     *            the file for this sequence
+     * @throws IllegalStateException
+     *             if the file has already been set.
+     */
+    public void setFile(Optional<File> file) {
+        if (this.file != null) {
+            throw new IllegalStateException("Cannot set the file to " + file + "; already set to " + this.file);
+        }
+        this.file = file;
     }
 
     /**

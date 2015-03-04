@@ -14,6 +14,7 @@ import java.util.function.LongConsumer;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
@@ -32,14 +33,15 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class OutputModel implements AutoCloseable {
     private final Sequencer sequencer;
-    private ParsedSequence sequence;
+    private ParsedSequence sequence = ParsedSequence.createEmpty();
     private Optional<MidiDevice> output = Optional.empty();
     private Optional<Receiver> receiver = Optional.empty();
 
     private final List<Consumer<? super ParsedSequence>> startListeners = new CopyOnWriteArrayList<>();
     private final List<LongConsumer> currentTimeListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<? super Info>> outputDeviceListeners = new CopyOnWriteArrayList<>();
 
-    private final Thread tickThread = new Thread() {
+    private final Thread tickThread = new Thread("output model current tick thread") {
         @Override
         public void run() {
             try {
@@ -55,18 +57,20 @@ public class OutputModel implements AutoCloseable {
 
     /**
      * Constructs a new {@link OutputModel} with the specified initial state.
+     * <p>
+     * The output model is initially unconnected to any MIDI devices. After
+     * construction, it is expected that an output device will be set by the
+     * consumer.
      *
-     * @param output
-     *            The initial output MIDI device to connect to
      * @param sequencerFactory
      *            A factory for producing the {@link Sequencer}, such as
      *            {@link SystemSequencerFactory}.
      * @throws MidiUnavailableException
      *             if the MIDI system is unavailable.
      */
-    public OutputModel(MidiDevice output, SequencerFactory sequencerFactory) throws MidiUnavailableException {
+    public OutputModel(SequencerFactory sequencerFactory) throws MidiUnavailableException {
         sequencer = sequencerFactory.getSequencer();
-        setOutputDevice(output);
+        setOutputDevice(new InitialMidiDevice());
     }
 
     /**
@@ -77,19 +81,29 @@ public class OutputModel implements AutoCloseable {
      * @throws MidiUnavailableException
      *             if the MIDI system is unavailable.
      */
-    public void setOutputDevice(MidiDevice output) throws MidiUnavailableException {
-        sequencer.close();
-        this.output.ifPresent(MidiDevice::close);
-        this.output = Optional.of(output);
+    public synchronized void setOutputDevice(MidiDevice output) throws MidiUnavailableException {
+        try {
+            sequencer.close();
+            this.output.ifPresent(MidiDevice::close);
+            this.output = Optional.of(output);
 
-        output.open();
-        receiver = Optional.of(output.getReceiver());
-        sequencer.getTransmitter().setReceiver(receiver.get());
-        sequencer.open();
+            output.open();
+            receiver = Optional.of(output.getReceiver());
+            sequencer.getTransmitter().setReceiver(receiver.get());
+            sequencer.open();
+            sequencer.setSequence(sequence.getSequence());
+            outputDeviceListeners.forEach(listener -> listener.accept(output.getDeviceInfo()));
+        } catch (final InvalidMidiDataException e) {
+            // Sequence should still be valid since openMidiFile didn't throw
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
      * Starts playback of the currently loaded MIDI file.
+     * <p>
+     * Any registered start listeners will be called with the last opened MIDI
+     * sequence.
      */
     public void start() {
         sequencer.stop();
@@ -101,6 +115,9 @@ public class OutputModel implements AutoCloseable {
 
     /**
      * Parses a MIDI file and prepares it for playback.
+     * <p>
+     * Any registered start listeners will be called with the parsed sequence.
+     * The file of the parsed sequence will be the specified MIDI file.
      *
      * @param midi
      *            the MIDI file to open
@@ -109,18 +126,19 @@ public class OutputModel implements AutoCloseable {
      */
     public void openMidiFile(File midi) throws IOException {
         try (InputStream in = new FileInputStream(midi)) {
-            openMidiFile(in);
+            openMidiFile(in, Optional.of(midi));
         }
     }
 
     @VisibleForTesting
-    void openMidiFile(InputStream midiStream) throws IOException {
+    void openMidiFile(InputStream midiStream, Optional<File> midi) throws IOException {
         try {
             if (tickThread.getState() == State.NEW) {
                 tickThread.start();
             }
 
             sequence = ParsedSequence.parseByTracks(MidiSystem.getSequence(midiStream));
+            sequence.setFile(midi);
             sequencer.stop();
             sequencer.setSequence(sequence.getSequence());
             sequencer.setMicrosecondPosition(0);
@@ -158,12 +176,22 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
+     * Adds a listener to notify when the output device has changed.
+     *
+     * @param listener
+     *            the listener to add
+     */
+    public void addOutputDeviceListener(Consumer<? super Info> listener) {
+        outputDeviceListeners.add(listener);
+    }
+
+    /**
      * Sends a MIDI message to the output.
      *
      * @param message
      *            the MIDI message to send to the connected output device
      */
-    public void sendMessage(MidiMessage message) {
+    public synchronized void sendMessage(MidiMessage message) {
         receiver.ifPresent(receive -> receive.send(message, -1));
     }
 

@@ -3,6 +3,7 @@ package net.kreatious.pianoleopard.keyboardselect;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -26,66 +27,79 @@ public class SelectKeyboardDialogTest {
     private final MidiDevice receiver = devices.addUnlimitedReceiver("receiver");
     private final MidiDevice defaultTransmitter = devices.addTransmitter("defaultTransmitter");
     private final MidiDevice defaultReceiver = devices.addReceiver("defaultReceiver");
-    private final SelectKeyboardDialog dialog;
+    private final Optional<Keyboard> firstSelectedKeyboard = Optional.of(new Keyboard(defaultTransmitter,
+            defaultReceiver));
 
     /**
-     * Constructs a new SelectKeyboardDialogTest with the default keyboard
-     * devices set.
-     */
-    public SelectKeyboardDialogTest() {
-        dialog = new SelectKeyboardDialog(new Keyboard(defaultTransmitter, defaultReceiver), devices);
-    }
-
-    /**
-     * Tests the OK button
+     * Tests the OK button for the first time the dialog is shown, without an
+     * existing keyboard
      */
     @Test
     public void testOK() {
-        getComboBoxWithDevice(transmitter).setSelectedItem(new DeviceRow(transmitter));
-        getComboBoxWithDevice(receiver).setSelectedItem(new DeviceRow(receiver));
-        getButtonWithText("OK").doClick();
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(Optional.empty(), devices);
+        getComboBoxWithDevice(dialog, transmitter).setSelectedItem(new DeviceRow(transmitter));
+        getComboBoxWithDevice(dialog, receiver).setSelectedItem(new DeviceRow(receiver));
+        getButtonWithText(dialog, "OK").doClick();
 
-        final Keyboard keyboard = dialog.getKeyboard();
+        final Keyboard keyboard = dialog.getKeyboard().get();
         assertThat(keyboard.getInput(), is(transmitter));
         assertThat(keyboard.getOutput(), is(receiver));
         assertThat(dialog.getDialog().isValid(), is(false));
     }
 
     /**
-     * Tests that the dialog reads the current state of the keyboard model
+     * Tests that the dialog reads the current state of the keyboard model, with
+     * an existing keyboard
      */
     @Test
     public void testOKNoSelection() {
-        getButtonWithText("OK").doClick();
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+        getButtonWithText(dialog, "OK").doClick();
 
-        final Keyboard keyboard = dialog.getKeyboard();
+        final Keyboard keyboard = dialog.getKeyboard().get();
         assertThat(keyboard.getInput(), is(defaultTransmitter));
         assertThat(keyboard.getOutput(), is(defaultReceiver));
         assertThat(dialog.getDialog().isValid(), is(false));
     }
 
     /**
-     * Tests the cancel button
+     * Tests the cancel button the first time the dialog is shown, without an
+     * existing keyboard
+     */
+    @Test
+    public void testCancelFirst() {
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(Optional.empty(), devices);
+        getComboBoxWithDevice(dialog, transmitter).setSelectedItem(new DeviceRow(transmitter));
+        getComboBoxWithDevice(dialog, receiver).setSelectedItem(new DeviceRow(receiver));
+        getButtonWithText(dialog, "Cancel").doClick();
+
+        assertThat(dialog.getKeyboard(), is(Optional.empty()));
+        assertThat(dialog.getDialog().isValid(), is(false));
+    }
+
+    /**
+     * Tests the cancel button if the dialog is shown with an existing keyboard
      */
     @Test
     public void testCancel() {
-        getComboBoxWithDevice(transmitter).setSelectedItem(new DeviceRow(transmitter));
-        getComboBoxWithDevice(receiver).setSelectedItem(new DeviceRow(receiver));
-        getButtonWithText("Cancel").doClick();
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+        getComboBoxWithDevice(dialog, transmitter).setSelectedItem(new DeviceRow(transmitter));
+        getComboBoxWithDevice(dialog, receiver).setSelectedItem(new DeviceRow(receiver));
+        getButtonWithText(dialog, "Cancel").doClick();
 
-        final Keyboard keyboard = dialog.getKeyboard();
+        final Keyboard keyboard = dialog.getKeyboard().get();
         assertThat(keyboard.getInput(), is(defaultTransmitter));
         assertThat(keyboard.getOutput(), is(defaultReceiver));
         assertThat(dialog.getDialog().isValid(), is(false));
     }
 
-    private JButton getButtonWithText(String text) {
+    private static JButton getButtonWithText(SelectKeyboardDialog dialog, String text) {
         return Stream.of(dialog.getDialog().getContentPane().getComponents())
                 .filter(component -> component instanceof JButton).map(component -> (JButton) component)
                 .filter(button -> button.getText().equals(text)).findFirst().get();
     }
 
-    private JComboBox<?> getComboBoxWithDevice(MidiDevice device) {
+    private static JComboBox<?> getComboBoxWithDevice(SelectKeyboardDialog dialog, MidiDevice device) {
         return Stream.of(dialog.getDialog().getContentPane().getComponents())
                 .filter(component -> component instanceof JPanel).map(component -> (JPanel) component)
                 .flatMap(panel -> Stream.of(panel.getComponents()))

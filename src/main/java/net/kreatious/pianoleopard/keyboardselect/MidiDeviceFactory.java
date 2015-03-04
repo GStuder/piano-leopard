@@ -1,5 +1,7 @@
 package net.kreatious.pianoleopard.keyboardselect;
 
+import java.util.stream.Stream;
+
 import javax.sound.midi.MidiDevice;
 
 /**
@@ -17,4 +19,18 @@ interface MidiDeviceFactory {
      *         MIDI device
      */
     MidiDevice[] getMidiDevices();
+
+    /**
+     * @return a new stream of MIDI devices with receiver (output) capability.
+     */
+    default Stream<MidiDevice> getReceivers() {
+        return Stream.of(getMidiDevices()).filter(device -> device.getMaxReceivers() != 0);
+    }
+
+    /**
+     * @return a new stream of MIDI devices with transmitter (input) capability.
+     */
+    default Stream<MidiDevice> getTransmitters() {
+        return Stream.of(getMidiDevices()).filter(device -> device.getMaxTransmitters() != 0);
+    }
 }

@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
@@ -32,17 +35,18 @@ public class InputModel implements AutoCloseable, ParsedTrack {
     private final IntervalSet<Long, EventPair<NoteEvent>> notes = new IntervalSet<>();
     private final IntervalSet<Long, EventPair<PedalEvent>> pedals = new IntervalSet<>();
 
+    private final List<Consumer<? super Info>> inputDeviceListeners = new CopyOnWriteArrayList<>();
+
     private InputModel(MidiDevice input) throws MidiUnavailableException {
         setInputDevice(input);
     }
 
     /**
      * Constructs a new {@link InputModel} with the specified initial state.
-     * After construction, the input model is ready to listen for incoming
-     * events from the user.
+     * <p>
+     * After construction, the input model is not connected to any actual
+     * devices. It is expected that the consumer will change the input device.
      *
-     * @param input
-     *            The initial input MIDI device to connect to
      * @param outputModel
      *            the output model to coordinate with
      * @return a new instance of {@link InputModel}. The caller is responsible
@@ -50,16 +54,14 @@ public class InputModel implements AutoCloseable, ParsedTrack {
      * @throws MidiUnavailableException
      *             if the MIDI system is unavailable.
      */
-    public static InputModel create(MidiDevice input, OutputModel outputModel) throws MidiUnavailableException {
-        final InputModel result = new InputModel(input);
+    public static InputModel create(OutputModel outputModel) throws MidiUnavailableException {
+        final InputModel result = new InputModel(new InitialMidiDevice());
         outputModel.addStartListener(result::setCurrentSequence);
         outputModel.addCurrentTimeListener(result.receiver::setCurrentTime);
         return result;
     }
 
     private void setCurrentSequence(@SuppressWarnings("unused") ParsedSequence sequence) {
-        notes.clear();
-        pedals.clear();
         receiver.clear();
     }
 
@@ -101,12 +103,12 @@ public class InputModel implements AutoCloseable, ParsedTrack {
         }
 
         @Override
-        public Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
+        public synchronized Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
             return getPairs(low, high, onNotes, notes);
         }
 
         @Override
-        public Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
+        public synchronized Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
             return getPairs(low, high, onPedals, pedals);
         }
 
@@ -122,9 +124,11 @@ public class InputModel implements AutoCloseable, ParsedTrack {
 
         void clear() {
             synchronized (notes) {
+                notes.clear();
                 onNotes.clear();
             }
             synchronized (pedals) {
+                pedals.clear();
                 onPedals.clear();
             }
         }
@@ -149,10 +153,22 @@ public class InputModel implements AutoCloseable, ParsedTrack {
 
         input.open();
         input.getTransmitter().setReceiver(receiver);
+        receiver.clear();
+        inputDeviceListeners.forEach(listener -> listener.accept(input.getDeviceInfo()));
+    }
+
+    /**
+     * Adds a listener to notify when the input device has changed.
+     *
+     * @param listener
+     *            the listener to add
+     */
+    public void addInputDeviceListener(Consumer<? super Info> listener) {
+        inputDeviceListeners.add(listener);
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         input.ifPresent(MidiDevice::close);
     }
 

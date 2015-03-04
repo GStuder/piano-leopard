@@ -1,7 +1,9 @@
 package net.kreatious.pianoleopard.keyboardselect;
 
+import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Toolkit;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -22,19 +24,19 @@ public class SelectKeyboardDialog {
     private final KeyboardSelector input;
     private final KeyboardSelector output;
     private final JDialog dialog;
-    private Keyboard keyboard;
+    private Optional<Keyboard> keyboard;
 
     /**
      * Constructs a new {@link SelectKeyboardDialog} for selecting the desired
      * MIDI device.
      *
      * @param keyboard
-     *            the original {@link Keyboard} model to display
+     *            the original {@link Keyboard} model to display, if applicable
      * @param deviceFactory
      *            the {@link MidiDeviceFactory} for obtaining available MIDI
      *            devices
      */
-    public SelectKeyboardDialog(Keyboard keyboard, MidiDeviceFactory deviceFactory) {
+    public SelectKeyboardDialog(Optional<Keyboard> keyboard, MidiDeviceFactory deviceFactory) {
         this.keyboard = keyboard;
         dialog = new JDialog();
         dialog.setModalityType(ModalityType.TOOLKIT_MODAL);
@@ -52,11 +54,11 @@ public class SelectKeyboardDialog {
         dialog.add(new JLabel("Select which MIDI keyboard to use"), "2, 2, 5, 1");
 
         input = new KeyboardSelector("Input:", device -> device.getMaxTransmitters() != 0, deviceFactory);
-        input.setSelectedDevice(keyboard.getInput());
+        keyboard.map(Keyboard::getInput).ifPresent(input::setSelectedDevice);
         dialog.add(input.getPanel(), "2, 4, 5, 1");
 
         output = new KeyboardSelector("Output:", device -> device.getMaxReceivers() != 0, deviceFactory);
-        output.setSelectedDevice(keyboard.getOutput());
+        keyboard.map(Keyboard::getOutput).ifPresent(output::setSelectedDevice);
         dialog.add(output.getPanel(), "2, 6, 5, 1");
 
         final JButton btnOk = new JButton("OK");
@@ -73,29 +75,38 @@ public class SelectKeyboardDialog {
     }
 
     private void apply() {
-        keyboard = new Keyboard(input.getSelectedDevice().get(), output.getSelectedDevice().get());
+        keyboard = Optional.of(new Keyboard(input.getSelectedDevice().get(), output.getSelectedDevice().get()));
     }
 
     /**
      * @return the {@link JDialog} associated with this dialog
      */
     @VisibleForTesting
-    public JDialog getDialog() {
+    JDialog getDialog() {
         return dialog;
     }
 
     /**
      * Shows the select keyboard dialog. This method blocks until a keyboard has
      * been selected.
+     *
+     * @param parent
+     *            the parent component to layout this dialog relative to
+     * @return the selected keyboard, unless the dialog was cancelled
      */
-    public void showDialog() {
+    public Optional<Keyboard> showDialog(Optional<Component> parent) {
+        parent.ifPresent(dialog::setLocationRelativeTo);
+
+        final Optional<Keyboard> oldKeyboard = keyboard;
         dialog.setVisible(true);
+        return oldKeyboard.equals(keyboard) ? Optional.empty() : keyboard;
     }
 
     /**
      * @return the selected keyboard
      */
-    public Keyboard getKeyboard() {
+    @VisibleForTesting
+    Optional<Keyboard> getKeyboard() {
         return keyboard;
     }
 }

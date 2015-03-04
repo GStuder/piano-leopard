@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
@@ -44,7 +45,8 @@ public class OutputModelTest {
     public OutputModelTest() throws MidiUnavailableException {
         given(output.getReceiver()).willReturn(mock(Receiver.class));
         given(sequencer.getTransmitter()).willReturn(mock(Transmitter.class));
-        outputModel = new OutputModel(output, () -> sequencer);
+        outputModel = new OutputModel(() -> sequencer);
+        outputModel.setOutputDevice(output);
     }
 
     /**
@@ -107,7 +109,7 @@ public class OutputModelTest {
     public void testStart() throws IOException, InvalidMidiDataException, InterruptedException {
         final Consumer<ParsedSequence> startListener = mock(Consumer.class);
         outputModel.addStartListener(startListener);
-        outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"));
+        outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"), Optional.empty());
         outputModel.start();
         outputModel.close();
 
@@ -131,7 +133,7 @@ public class OutputModelTest {
      */
     @Test
     public void testStartTwice() throws IOException, InvalidMidiDataException, InterruptedException {
-        outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"));
+        outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"), Optional.empty());
         outputModel.start();
         outputModel.start();
         outputModel.close();
@@ -159,7 +161,7 @@ public class OutputModelTest {
     public void testCurrentTimeListener() throws IOException, InvalidMidiDataException, InterruptedException {
         final LongConsumer currentTimeListener = mock(LongConsumer.class);
         outputModel.addCurrentTimeListener(currentTimeListener);
-        outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"));
+        outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"), Optional.empty());
         outputModel.start();
 
         then(currentTimeListener).should(timeout(120).atLeast(2)).accept(anyLong());
