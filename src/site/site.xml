@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.4.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.4.0 http://maven.apache.org/xsd/decoration-1.4.0.xsd">
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.3.1</version>
+    </skin>
+    <body>
+        <links>
+            <item name="pianoleopard" href="https://github.com/GStuder/piano-leopard" />
+        </links>
+        <menu name="Piano Leopard">
+            <item name="Javadoc" href="apidocs/index.html" />
+            <item name="Release Notes" href="changes-report.html" />
+        </menu>
+        <menu ref="reports" />
+    </body>
+</project>

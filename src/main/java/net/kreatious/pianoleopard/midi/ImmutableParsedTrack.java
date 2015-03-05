@@ -7,6 +7,7 @@ import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
+import net.kreatious.pianoleopard.midi.event.TempoCache;
 
 /**
  * Represents a parsed MIDI track with efficient retrieval by time range.

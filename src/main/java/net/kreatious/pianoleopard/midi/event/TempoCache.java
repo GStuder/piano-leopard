@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi;
+package net.kreatious.pianoleopard.midi.event;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
@@ -22,7 +22,8 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * Maps from MIDI ticks to microseconds.
  * <p>
- * This class is intended to be used only by this package and its subpackages.
+ * This class is intended to be used only by the midi package and its
+ * subpackages.
  *
  * @author Jay-R Studer
  */

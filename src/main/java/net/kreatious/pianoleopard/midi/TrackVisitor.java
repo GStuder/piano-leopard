@@ -9,6 +9,7 @@ import javax.sound.midi.Track;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventFactory;
 import net.kreatious.pianoleopard.midi.event.EventPair;
+import net.kreatious.pianoleopard.midi.event.TempoCache;
 
 /**
  * Decomposes a {@link Track} into {@link EventPair}s

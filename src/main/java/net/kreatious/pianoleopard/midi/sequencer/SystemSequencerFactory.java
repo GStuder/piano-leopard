@@ -5,7 +5,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 
 /**
- * Provides the MIDI devices connected to the current system.
+ * Provides the MIDI sequencer for the current system.
  *
  * @author Jay-R Studer
  */

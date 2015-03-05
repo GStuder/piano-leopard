@@ -105,17 +105,17 @@ public class InputModel implements AutoCloseable, ParsedTrack {
         }
 
         @Override
-        public synchronized Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
+        public Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
             return getPairs(low, high, onNotes, notes);
         }
 
         @Override
-        public synchronized Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
+        public Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
             return getPairs(low, high, onPedals, pedals);
         }
 
-        private <K extends Event> Iterable<EventPair<K>> getPairs(long low, long high, Map<Object, K> onEvents,
-                IntervalSet<Long, EventPair<K>> fullEvents) {
+        private synchronized <K extends Event> Iterable<EventPair<K>> getPairs(long low, long high,
+                Map<Object, K> onEvents, IntervalSet<Long, EventPair<K>> fullEvents) {
             synchronized (fullEvents) {
                 final List<EventPair<K>> result = new ArrayList<>();
                 fullEvents.subSet(low, high).forEach(result::add);

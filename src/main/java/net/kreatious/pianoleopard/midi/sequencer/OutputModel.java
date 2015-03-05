@@ -118,7 +118,7 @@ public class OutputModel implements AutoCloseable {
     public void start() {
         sequencer.stop();
         sequencer.setMicrosecondPosition(0);
-        receiver.ifPresent(OutputModel::resetReceiver);
+        resetReceiver();
         startListeners.forEach(listener -> listener.accept(sequence));
         playListeners.forEach(Runnable::run);
         sequencer.start();
@@ -251,7 +251,7 @@ public class OutputModel implements AutoCloseable {
             sequencer.stop();
             sequencer.setSequence(sequence.getSequence());
             sequencer.setMicrosecondPosition(0);
-            receiver.ifPresent(OutputModel::resetReceiver);
+            resetReceiver();
             startListeners.forEach(listener -> listener.accept(sequence));
         } catch (final InvalidMidiDataException e) {
             throw new IOException(e);
@@ -321,17 +321,17 @@ public class OutputModel implements AutoCloseable {
         tickThread.join();
 
         sequencer.close();
-        receiver.ifPresent(OutputModel::resetReceiver);
+        resetReceiver();
         output.ifPresent(MidiDevice::close);
     }
 
-    private static void resetReceiver(Receiver receiver) {
+    private synchronized void resetReceiver() {
         try {
             for (int channel = 0; channel != 16; channel++) {
                 // All notes off, reset all controllers, reset programs
-                receiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 123, 0), ALWAYS_SEND);
-                receiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 121, 0), ALWAYS_SEND);
-                receiver.send(new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, 0, 0), ALWAYS_SEND);
+                sendMessage(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 123, 0));
+                sendMessage(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 121, 0));
+                sendMessage(new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, 0, 0));
             }
         } catch (final InvalidMidiDataException e) {
             // Unreachable

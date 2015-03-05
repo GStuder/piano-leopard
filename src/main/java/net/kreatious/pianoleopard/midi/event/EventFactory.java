@@ -6,8 +6,6 @@ import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
-import net.kreatious.pianoleopard.midi.TempoCache;
-
 /**
  * Creates {@link Event} subclasses from {@link MidiEvent}s
  *

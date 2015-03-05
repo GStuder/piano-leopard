@@ -21,6 +21,9 @@ import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
  * @author Jay-R Studer
  */
 class PracticeTrackController {
+    private PracticeTrackController() {
+    }
+
     /**
      * Constructs a view and associates it with its controller
      */

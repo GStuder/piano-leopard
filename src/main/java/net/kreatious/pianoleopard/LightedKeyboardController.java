@@ -1,16 +1,18 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
 
+import net.kreatious.pianoleopard.Keys.KeyIterator;
 import net.kreatious.pianoleopard.midi.ParsedSequence;
 import net.kreatious.pianoleopard.midi.ParsedTrack;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
-import net.kreatious.pianoleopard.midi.sequencer.Keys.KeyIterator;
+import net.kreatious.pianoleopard.midi.sequencer.InputModel;
+import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
 /**
  * Provides support for lighted keyboards.
@@ -20,7 +22,7 @@ import net.kreatious.pianoleopard.midi.sequencer.Keys.KeyIterator;
  *
  * @author Jay-R Studer
  */
-public class LightedKeyboardController {
+class LightedKeyboardController {
     private static final long OFFSET = TimeUnit.MILLISECONDS.toMicros(500);
     private static final long NOTE_GAP = TimeUnit.MILLISECONDS.toMicros(50);
     private static final int NAVIGATION_CHANNEL = 3;
@@ -46,7 +48,7 @@ public class LightedKeyboardController {
      *            the {@link InputModel} to listen for user events
      * @return a new instance of {@link LightedKeyboardController}
      */
-    public static LightedKeyboardController create(OutputModel outputModel, InputModel inputModel) {
+    static LightedKeyboardController create(OutputModel outputModel, InputModel inputModel) {
         final LightedKeyboardController result = new LightedKeyboardController(outputModel);
         outputModel.addCurrentTimeListener(result::setCurrentTime);
         outputModel.addStartListener(result::setCurrentSequence);

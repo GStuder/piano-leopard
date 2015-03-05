@@ -3,7 +3,6 @@ package net.kreatious.pianoleopard.intervalset;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -391,10 +390,10 @@ class Entry<K extends Comparable<K>, V> {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof Map.Entry)) {
+        } else if (!(o instanceof Entry)) {
             return false;
         } else {
-            final Map.Entry<?, ?> other = (Map.Entry<?, ?>) o;
+            final Entry<?, ?> other = (Entry<?, ?>) o;
             return key.equals(other.getKey());
         }
     }

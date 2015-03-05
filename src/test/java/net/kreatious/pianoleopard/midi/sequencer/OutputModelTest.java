@@ -177,12 +177,15 @@ public class OutputModelTest {
      *             exception is never thrown from this test
      * @throws InvalidMidiDataException
      *             exception is never thrown from this test
+     * @throws InterruptedException
+     *             if the current thread is interrupted
      */
     @Test
-    public void testSendMessage() throws MidiUnavailableException, InvalidMidiDataException {
+    public void testSendMessage() throws MidiUnavailableException, InvalidMidiDataException, InterruptedException {
         final ShortMessage message = new ShortMessage(ShortMessage.SYSTEM_RESET);
         outputModel.setOutputDevice(output);
         outputModel.sendMessage(message);
+        outputModel.close();
 
         then(output.getReceiver()).should().send(message, -1);
     }

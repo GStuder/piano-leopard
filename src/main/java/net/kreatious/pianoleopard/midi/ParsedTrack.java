@@ -4,6 +4,7 @@ import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
 
+
 /**
  * Provides an immutable view of a MIDI track with efficient retrieval by time
  * range.

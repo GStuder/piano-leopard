@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi;
+package net.kreatious.pianoleopard.midi.event;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

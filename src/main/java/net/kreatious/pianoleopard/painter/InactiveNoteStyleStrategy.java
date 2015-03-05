@@ -15,7 +15,7 @@ import net.kreatious.pianoleopard.midi.event.NoteEvent;
  * @author Jay-R Studer
  */
 class InactiveNoteStyleStrategy implements StyleStrategy<NoteEvent> {
-    private static final Color NATURAL_COLOR = new Color(0xCCCCCC);
+    private static final Color NATURAL_COLOR = new Color(0xBBBBBB);
     private static final Color SHARP_COLOR = new Color(0x333333);
     private static final Stroke STROKE = new BasicStroke(1.0f);
 

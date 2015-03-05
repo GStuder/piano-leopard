@@ -4,12 +4,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
@@ -29,7 +31,19 @@ class OpenController {
      */
     static Component create(Component parent, Preferences preferences, OutputModel outputModel) {
         final JFileChooser chooser = new JFileChooser();
-        chooser.setPreferredSize(new Dimension(600, 400));
+        chooser.setPreferredSize(new Dimension(700, 500));
+        chooser.setFileFilter(new FileFilter() {
+            @Override
+            public String getDescription() {
+                return "MIDI Files (.mid, .midi)";
+            }
+
+            @Override
+            public boolean accept(File f) {
+                final String name = f.getName().toLowerCase(Locale.ROOT);
+                return name.endsWith(".mid") || name.endsWith(".midi") || f.isDirectory();
+            }
+        });
         Optional.ofNullable(preferences.get(DIRECTORY_PREFERENCE, null)).map(File::new)
                 .ifPresent(chooser::setCurrentDirectory);
 

@@ -22,6 +22,7 @@ import javax.sound.midi.Track;
 
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventPair;
+import net.kreatious.pianoleopard.midi.event.TempoCache;
 
 import org.hamcrest.Matcher;
 import org.junit.After;

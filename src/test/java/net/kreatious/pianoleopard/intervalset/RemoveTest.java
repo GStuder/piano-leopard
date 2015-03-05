@@ -56,7 +56,7 @@ public class RemoveTest {
      *
      * @return a list of test cases
      */
-    @Parameters(name = "removing interval [{0}] leaves {1}")
+    @Parameters(name = "removing interval [{0}]")
     public static List<Object[]> parameters() {
         final List<Object[]> tests = new ArrayList<>();
         for (final Interval<Integer> testInterval : INTERVALS) {

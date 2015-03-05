@@ -14,6 +14,8 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 
+import net.kreatious.pianoleopard.midi.event.TempoCache;
+
 /**
  * Represents a parsed MIDI sequence containing multiple parsed tracks
  *

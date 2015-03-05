@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -14,7 +14,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import net.kreatious.pianoleopard.midi.sequencer.Keys.KeyIterator;
+import net.kreatious.pianoleopard.Keys.KeyIterator;
 
 import org.junit.Test;
 

@@ -21,7 +21,7 @@ import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 public class PainterPanel {
     private final class PainterPanelImpl extends JPanel {
         private static final long serialVersionUID = 3647951920113354307L;
-        final Painter painter = new Painter(new Dimension());
+        private final Painter painter = new Painter(new Dimension());
 
         PainterPanelImpl() {
             setPreferredSize(new Dimension(1000, 500));
