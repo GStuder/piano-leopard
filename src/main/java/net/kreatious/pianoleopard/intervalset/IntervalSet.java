@@ -8,6 +8,9 @@ import java.util.function.Predicate;
  * An ordered tree data structure for holding intervals. The user can
  * efficiently find all intervals that overlap with a given interval or point.
  * <p>
+ * Interval sets are optimized for being queried far more often than they are
+ * modified.
+ * <p>
  * This set does not support null keys or values, but does support duplicate
  * intervals.
  *

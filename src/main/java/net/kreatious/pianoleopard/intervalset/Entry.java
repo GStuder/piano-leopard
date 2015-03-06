@@ -1,11 +1,11 @@
 package net.kreatious.pianoleopard.intervalset;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 class Entry<K extends Comparable<K>, V> {
     private Interval<K> key;
     private K maximum;
-    private Set<V> values;
+    private List<V> values = new ArrayList<>();
     private Optional<Entry<K, V>> left = Optional.empty();
     private Optional<Entry<K, V>> right = Optional.empty();
     private Optional<Entry<K, V>> parent = Optional.empty();
@@ -22,7 +22,7 @@ class Entry<K extends Comparable<K>, V> {
     Entry(Interval<K> key, V value, Optional<Entry<K, V>> parent) {
         Objects.requireNonNull(value);
         this.key = key;
-        this.values = new HashSet<>(Arrays.asList(value));
+        values.add(value);
         this.parent = parent;
         this.maximum = key.getHigh();
     }
@@ -377,13 +377,26 @@ class Entry<K extends Comparable<K>, V> {
         return key;
     }
 
-    Set<V> getValues() {
+    Collection<V> getValues() {
         return values;
     }
 
+    /**
+     * Adds a value to this entry.
+     * <p>
+     * Entries do not allow duplicates and act as a set.
+     *
+     * @param value
+     *            the value to add
+     * @return true if a value was added, false otherwise
+     */
     boolean addValue(V value) {
         Objects.requireNonNull(value);
-        return values.add(value);
+        if (values.contains(value)) {
+            return false;
+        }
+        values.add(value);
+        return true;
     }
 
     @Override

@@ -1,10 +1,10 @@
 package net.kreatious.pianoleopard.intervalset;
 
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Provides in order iteration over an entire set
@@ -21,7 +21,7 @@ class InOrderIterator<K extends Comparable<K>, V> implements Iterator<V> {
         this.set = set;
         expectedModifications = set.getModifications();
         next = findSmallestEntry();
-        subiterator = next.map(Entry::getValues).map(Set::iterator);
+        subiterator = next.map(Entry::getValues).map(Collection::iterator);
     }
 
     private Optional<Entry<K, V>> findSmallestEntry() {
@@ -48,7 +48,7 @@ class InOrderIterator<K extends Comparable<K>, V> implements Iterator<V> {
         final V result = subiterator.map(Iterator::next).get();
         if (!subiterator.map(Iterator::hasNext).orElse(false)) {
             next = successor(next);
-            subiterator = next.map(Entry::getValues).map(Set::iterator);
+            subiterator = next.map(Entry::getValues).map(Collection::iterator);
         }
         return result;
     }
