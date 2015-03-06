@@ -50,7 +50,7 @@ public class SelectKeyboardDialog {
                 FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                 FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, }));
 
-        dialog.add(new JLabel("Select which MIDI keyboard to use"), "2, 2, 7, 1");
+        dialog.add(new JLabel("Select which MIDI keyboard to use:"), "2, 2, 7, 1");
 
         input = new KeyboardSelector("Input:", device -> device.getMaxTransmitters() != 0, deviceFactory);
         keyboard.map(Keyboard::getInput).ifPresent(input::setSelectedDevice);
