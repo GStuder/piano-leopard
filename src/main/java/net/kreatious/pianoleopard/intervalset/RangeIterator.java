@@ -4,7 +4,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -23,7 +22,9 @@ class RangeIterator<K extends Comparable<K>, V> implements Iterator<V> {
     private final Predicate<Entry<K, V>> lowBeforeEndWithinResult;
 
     private Optional<Entry<K, V>> next;
-    private Optional<Iterator<V>> subiterator;
+
+    // Nullable - performance reasons
+    private Iterator<V> subiterator;
 
     RangeIterator(IntervalSet<K, V> set, Interval<K> range, Optional<Entry<K, V>> first) {
         this.set = set;
@@ -34,26 +35,28 @@ class RangeIterator<K extends Comparable<K>, V> implements Iterator<V> {
 
         expectedModifications = set.getModifications();
         next = first;
-        subiterator = first.map(Entry::getValues).map(Set::iterator);
+        if (first.isPresent()) {
+            subiterator = first.get().getValues().iterator();
+        }
     }
 
     @Override
     public final boolean hasNext() {
-        return subiterator.map(Iterator::hasNext).orElse(false);
+        return subiterator != null && subiterator.hasNext();
     }
 
     @Override
     public V next() {
-        if (!subiterator.isPresent()) {
+        if (subiterator == null) {
             throw new NoSuchElementException();
         } else if (set.getModifications() != expectedModifications) {
             throw new ConcurrentModificationException();
         }
 
-        final V result = subiterator.map(Iterator::next).get();
-        if (!subiterator.map(Iterator::hasNext).orElse(false)) {
+        final V result = subiterator.next();
+        if (!subiterator.hasNext()) {
             next = successor(next);
-            subiterator = next.map(Entry::getValues).map(Set::iterator);
+            subiterator = next.isPresent() ? next.get().getValues().iterator() : null;
         }
         return result;
     }
