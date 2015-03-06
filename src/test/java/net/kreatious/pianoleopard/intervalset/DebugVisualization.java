@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,18 +43,18 @@ import com.jgoodies.forms.layout.RowSpec;
  *
  * @author Jay-R Studer
  */
-class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
+class DebugVisualization<V> extends JDialog {
     private static final long serialVersionUID = -987900044387917878L;
 
-    final IntervalSet<K, V> set;
+    final IntervalSet<V> set;
     final Map<Iterator<V>, Decorations> ranges = new HashMap<>();
 
-    static class OnTestFailureDebugClassRule<K extends Comparable<K>, V> implements TestRule {
-        final IntervalSet<K, V> set;
+    static class OnTestFailureDebugClassRule<V> implements TestRule {
+        final IntervalSet<V> set;
         int failures;
-        private final DebugVisualization<K, V> visualization;
+        private final DebugVisualization<V> visualization;
 
-        OnTestFailureDebugClassRule(IntervalSet<K, V> set) {
+        OnTestFailureDebugClassRule(IntervalSet<V> set) {
             this.set = set;
             visualization = new DebugVisualization<>(set);
         }
@@ -72,13 +73,13 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         }
     }
 
-    static class OnTestFailureDebugRule<K extends Comparable<K>, V> implements TestRule {
+    static class OnTestFailureDebugRule<V> implements TestRule {
         private static final Color[] TEST_FAILURE_COLORS = new Color[] { Color.RED, Color.GREEN, Color.BLUE,
                 Color.ORANGE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.YELLOW };
-        private final OnTestFailureDebugClassRule<K, V> classRule;
-        private final Interval<K> testRange;
+        private final OnTestFailureDebugClassRule<V> classRule;
+        private final Interval testRange;
 
-        OnTestFailureDebugRule(OnTestFailureDebugClassRule<K, V> classRule, Interval<K> testRange) {
+        OnTestFailureDebugRule(OnTestFailureDebugClassRule<V> classRule, Interval testRange) {
             this.classRule = classRule;
             this.testRange = testRange;
         }
@@ -107,18 +108,18 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         private final int number = ranges.size();
         private String action = "";
         private int step;
-        private Entry<K, V> previousPointer = set.getRoot().get();
-        private Entry<K, V> pointer = set.getRoot().get();
+        private Entry<V> previousPointer = set.getRoot().get();
+        private Entry<V> pointer = set.getRoot().get();
         private final Color color;
-        private final Set<Entry<K, V>> expected;
-        private final Set<Entry<K, V>> visited = new HashSet<>();
+        private final Set<Entry<V>> expected;
+        private final Set<Entry<V>> visited = new HashSet<>();
 
-        Decorations(K low, K high, Color color) {
+        Decorations(long low, long high, Color color) {
             searchInterval = "[" + low + ", " + high + "]";
             this.color = color;
-            final List<Entry<K, V>> children = new ArrayList<>();
+            final List<Entry<V>> children = new ArrayList<>();
             visitChildren(set.getRoot().get(), children::add);
-            expected = children.stream().filter(child -> child.getKey().containsInterval(new Interval<>(low, high)))
+            expected = children.stream().filter(child -> child.getKey().containsInterval(new Interval(low, high)))
                     .collect(toSet());
         }
     }
@@ -127,7 +128,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         private static final long serialVersionUID = -8045457048224352208L;
 
         private TreeDrawingPanel() {
-            final Map<Entry<K, V>, Rectangle> positions = new HashMap<>();
+            final Map<Entry<V>, Rectangle> positions = new HashMap<>();
             calculateNodePositions(positions, Collections.singletonList(set.getRoot()), 1, maxLevel(set.getRoot()), 100);
             setPreferredSize(new Dimension(positions.values().stream().map(rect -> rect.x + rect.width)
                     .max(Integer::compare).get(), positions.values().stream().map(rect -> rect.y + rect.height)
@@ -139,7 +140,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         public void paint(Graphics g) {
             super.paint(g);
 
-            final Map<Entry<K, V>, Rectangle> positions = new HashMap<>();
+            final Map<Entry<V>, Rectangle> positions = new HashMap<>();
             calculateNodePositions(positions, Collections.singletonList(set.getRoot()), 1, maxLevel(set.getRoot()), 100);
             positions.forEach((entry, position) -> {
                 g.setColor(Color.BLACK);
@@ -155,7 +156,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
                 g.drawRect(position.x, position.y, position.width, position.height);
             });
 
-            final Map<Entry<K, V>, Integer> numberTimesPainted = new HashMap<>();
+            final Map<Entry<V>, Integer> numberTimesPainted = new HashMap<>();
             ranges.values().forEach(
                     decorator -> {
                         final int timesPainted = numberTimesPainted.compute(decorator.pointer,
@@ -179,7 +180,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         }
     }
 
-    DebugVisualization(IntervalSet<K, V> set) {
+    DebugVisualization(IntervalSet<V> set) {
         this.set = set;
 
         setModalityType(ModalityType.TOOLKIT_MODAL);
@@ -194,7 +195,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         final JButton step = new JButton("Step");
         step.addActionListener(event -> {
             ranges.forEach(new BiConsumer<Iterator<V>, Decorations>() {
-                final Map<Set<V>, Entry<K, V>> entries = new IdentityHashMap<Set<V>, Entry<K, V>>() {
+                final Map<Collection<V>, Entry<V>> entries = new IdentityHashMap<Collection<V>, Entry<V>>() {
                     private static final long serialVersionUID = 7676204394757535429L;
                     {
                         visitChildren(set.getRoot().get(), entry -> put(entry.getValues(), entry));
@@ -202,7 +203,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
                 };
 
                 @Override
-                public void accept(Iterator<V> iterator, DebugVisualization<K, V>.Decorations decorator) {
+                public void accept(Iterator<V> iterator, DebugVisualization<V>.Decorations decorator) {
                     if (iterator == null) {
                         return;
                     } else if (iterator.hasNext()) {
@@ -227,11 +228,11 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
     /**
      * Adds the range that failed
      */
-    void show(K low, K high, Color color) {
+    void show(long low, long high, Color color) {
         ranges.put(set.subSet(low, high).iterator(), new Decorations(low, high, color));
     }
 
-    private int maxLevel(Optional<Entry<K, V>> node) {
+    private int maxLevel(Optional<Entry<V>> node) {
         if (!node.isPresent()) {
             return 0;
         }
@@ -249,9 +250,8 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
                 (int) (position.getCenterY() - bounds.getCenterY()));
     }
 
-    private void drawTraversal(Graphics g, Entry<K, V> start, Entry<K, V> end, int offsetY,
-            Map<Entry<K, V>, Rectangle> positions) {
-        final List<Entry<K, V>> successors = shortestPath(start, end);
+    private void drawTraversal(Graphics g, Entry<V> start, Entry<V> end, int offsetY, Map<Entry<V>, Rectangle> positions) {
+        final List<Entry<V>> successors = shortestPath(start, end);
 
         for (int i = 0; i < successors.size() - 1; i++) {
             final Rectangle startPosition = positions.get(successors.get(i));
@@ -261,8 +261,8 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         }
     }
 
-    private List<Entry<K, V>> shortestPath(Entry<K, V> start, Entry<K, V> end) {
-        final List<Entry<K, V>> result = new ArrayList<>();
+    private List<Entry<V>> shortestPath(Entry<V> start, Entry<V> end) {
+        final List<Entry<V>> result = new ArrayList<>();
         for (int i = 0;; i++) {
             if (shortestPath(start, end, i, result)) {
                 Collections.reverse(result);
@@ -271,7 +271,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         }
     }
 
-    private boolean shortestPath(Entry<K, V> start, Entry<K, V> end, int depth, List<Entry<K, V>> result) {
+    private boolean shortestPath(Entry<V> start, Entry<V> end, int depth, List<Entry<V>> result) {
         if (depth < 0) {
             return false;
         }
@@ -279,7 +279,7 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
             result.add(end);
             return true;
         }
-        for (final Entry<K, V> next : Stream.of(start.getLeft(), start.getParent(), start.getRight())
+        for (final Entry<V> next : Stream.of(start.getLeft(), start.getParent(), start.getRight())
                 .filter(Optional::isPresent).map(Optional::get).collect(toList())) {
             if (shortestPath(next, end, depth - 1, result)) {
                 result.add(start);
@@ -289,14 +289,14 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         return false;
     }
 
-    private void visitChildren(Entry<K, V> node, Consumer<Entry<K, V>> consumer) {
+    private void visitChildren(Entry<V> node, Consumer<Entry<V>> consumer) {
         node.getLeft().ifPresent(next -> visitChildren(next, consumer));
         consumer.accept(node);
         node.getRight().ifPresent(next -> visitChildren(next, consumer));
     }
 
-    private void calculateNodePositions(Map<Entry<K, V>, Rectangle> result, List<Optional<Entry<K, V>>> nodes,
-            int level, int maxLevel, int y) {
+    private void calculateNodePositions(Map<Entry<V>, Rectangle> result, List<Optional<Entry<V>>> nodes, int level,
+            int maxLevel, int y) {
         if (!nodes.stream().anyMatch(Optional::isPresent)) {
             return;
         }
@@ -305,10 +305,10 @@ class DebugVisualization<K extends Comparable<K>, V> extends JDialog {
         final int NODE_HEIGHT = 30;
         final int SPACE_MULTIPLIER = NODE_WIDTH / 2;
 
-        final List<Optional<Entry<K, V>>> newNodes = nodes
+        final List<Optional<Entry<V>>> newNodes = nodes
                 .stream()
                 .flatMap(
-                        node -> Stream.<Optional<Entry<K, V>>> of(node.flatMap(Entry::getLeft),
+                        node -> Stream.<Optional<Entry<V>>> of(node.flatMap(Entry::getLeft),
                                 node.flatMap(Entry::getRight))).collect(toList());
         final int betweenSpace = (int) Math.pow(2, maxLevel - level) * SPACE_MULTIPLIER;
         int x = betweenSpace / 2;

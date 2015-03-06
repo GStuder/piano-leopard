@@ -4,14 +4,14 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-class RangeIterable<K extends Comparable<K>, V> implements Iterable<V> {
-    private final IntervalSet<K, V> set;
-    private final Interval<K> range;
-    private final Optional<Entry<K, V>> first;
+class RangeIterable<V> implements Iterable<V> {
+    private final IntervalSet<V> set;
+    private final Interval range;
+    private final Optional<Entry<V>> first;
 
-    RangeIterable(IntervalSet<K, V> intervalSet, K lowKey, K highKey) {
+    RangeIterable(IntervalSet<V> intervalSet, long lowKey, long highKey) {
         set = intervalSet;
-        range = new Interval<>(lowKey, highKey);
+        range = new Interval(lowKey, highKey);
         first = first();
     }
 
@@ -20,12 +20,11 @@ class RangeIterable<K extends Comparable<K>, V> implements Iterable<V> {
         return new RangeIterator<>(set, range, first);
     }
 
-    private Optional<Entry<K, V>> first() {
-        final Predicate<Entry<K, V>> withinResult = current -> current.getKey().containsInterval(range);
-        final Predicate<Entry<K, V>> maximumIsAfterRangeStart = current -> current.getMaximum().compareTo(
-                range.getLow()) >= 0;
+    private Optional<Entry<V>> first() {
+        final Predicate<Entry<V>> withinResult = current -> current.getKey().containsInterval(range);
+        final Predicate<Entry<V>> maximumIsAfterRangeStart = current -> current.getMaximum() >= range.getLow();
 
-        Optional<Entry<K, V>> current = set.getRoot();
+        Optional<Entry<V>> current = set.getRoot();
         while (true) {
             if (current.flatMap(Entry::getLeft).filter(maximumIsAfterRangeStart).isPresent()) {
                 current = current.flatMap(Entry::getLeft);

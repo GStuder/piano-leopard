@@ -15,8 +15,8 @@ import net.kreatious.pianoleopard.midi.event.TempoCache;
  * @author Jay-R Studer
  */
 class ImmutableParsedTrack implements ParsedTrack {
-    private final IntervalSet<Long, EventPair<NoteEvent>> notes;
-    private final IntervalSet<Long, EventPair<PedalEvent>> pedals;
+    private final IntervalSet<EventPair<NoteEvent>> notes;
+    private final IntervalSet<EventPair<PedalEvent>> pedals;
 
     /**
      * Constructs a new {@link ImmutableParsedTrack} by parsing the specified

@@ -32,8 +32,8 @@ public class InputModel implements AutoCloseable, ParsedTrack {
     private Optional<MidiDevice> input = Optional.empty();
     private final ReceiverImpl receiver = new ReceiverImpl();
 
-    private final IntervalSet<Long, EventPair<NoteEvent>> notes = new IntervalSet<>();
-    private final IntervalSet<Long, EventPair<PedalEvent>> pedals = new IntervalSet<>();
+    private final IntervalSet<EventPair<NoteEvent>> notes = new IntervalSet<>();
+    private final IntervalSet<EventPair<PedalEvent>> pedals = new IntervalSet<>();
 
     private final List<Consumer<? super Info>> inputDeviceListeners = new CopyOnWriteArrayList<>();
     private final List<Consumer<? super Event>> inputListeners = new CopyOnWriteArrayList<>();
@@ -91,7 +91,7 @@ public class InputModel implements AutoCloseable, ParsedTrack {
         }
 
         private <K extends Event> void userPressedEvent(K event, Map<Object, K> onEvents,
-                IntervalSet<Long, EventPair<K>> fullEvents) {
+                IntervalSet<EventPair<K>> fullEvents) {
             synchronized (fullEvents) {
                 final long eventTime = event.getTime();
                 if (event.isOn()) {
@@ -115,7 +115,7 @@ public class InputModel implements AutoCloseable, ParsedTrack {
         }
 
         private synchronized <K extends Event> Iterable<EventPair<K>> getPairs(long low, long high,
-                Map<Object, K> onEvents, IntervalSet<Long, EventPair<K>> fullEvents) {
+                Map<Object, K> onEvents, IntervalSet<EventPair<K>> fullEvents) {
             synchronized (fullEvents) {
                 final List<EventPair<K>> result = new ArrayList<>();
                 fullEvents.subSet(low, high).forEach(result::add);

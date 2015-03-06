@@ -24,13 +24,13 @@ import com.google.common.collect.Lists;
  */
 @RunWith(Parameterized.class)
 public class RangeIteratorTest {
-    private static final IntervalSet<Integer, String> SET = new IntervalSet<>();
+    private static final IntervalSet<String> SET = new IntervalSet<>();
 
     /**
      * The bounds for the test case
      */
     @Parameter(0)
-    public Interval<Integer> interval;
+    public Interval interval;
 
     /**
      * The values expected to be returned by the test
@@ -45,20 +45,20 @@ public class RangeIteratorTest {
      */
     @Parameters(name = "interval [{0}] contains {1}")
     public static List<Object[]> parameters() {
-        final List<Interval<Integer>> intervals = new ArrayList<>();
+        final List<Interval> intervals = new ArrayList<>();
         final Random rnd = new Random(311);
         for (int i = 0; i != 63; i++) {
             final int low = rnd.nextInt(70);
             final int high = low + rnd.nextInt(50);
-            intervals.add(new Interval<>(low, high));
+            intervals.add(new Interval(low, high));
         }
         intervals.forEach(interval -> SET.put(interval.getLow(), interval.getHigh(), interval.toString()));
 
         final List<Object[]> tests = new ArrayList<>();
-        final int max = intervals.stream().map(Interval::getHigh).max(Integer::compare).get();
+        final long max = intervals.stream().mapToLong(Interval::getHigh).max().getAsLong();
         for (int i = 0; i <= max; i++) {
             for (int intervalSize = 0; intervalSize != 10; intervalSize++) {
-                final Interval<Integer> testInterval = new Interval<>(i, i + intervalSize);
+                final Interval testInterval = new Interval(i, i + intervalSize);
 
                 final List<String> expectedValues = intervals.stream()
                         .filter(interval -> interval.containsInterval(testInterval)).map(Interval::toString)

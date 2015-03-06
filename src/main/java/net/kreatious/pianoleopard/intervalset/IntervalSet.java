@@ -15,13 +15,11 @@ import java.util.function.Predicate;
  * intervals.
  *
  * @author Jay-R Studer
- * @param <K>
- *            the type of keys maintained by this set
  * @param <V>
  *            the type of mapped values
  */
-public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
-    private Optional<Entry<K, V>> root = Optional.empty();
+public class IntervalSet<V> implements Iterable<V> {
+    private Optional<Entry<V>> root = Optional.empty();
     private int size;
     private int modifications;
 
@@ -60,12 +58,12 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
      * @throws NullPointerException
      *             if the specified key or value is null
      */
-    public Optional<V> put(K low, K high, V value) {
-        if (low.compareTo(high) > 0) {
+    public Optional<V> put(long low, long high, V value) {
+        if (low > high) {
             return Optional.empty();
         }
 
-        final Interval<K> key = new Interval<>(low, high);
+        final Interval key = new Interval(low, high);
         if (!root.isPresent()) {
             root = Optional.of(new Entry<>(key, value, Optional.empty()));
             size = 1;
@@ -73,7 +71,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
             return Optional.empty();
         }
 
-        final Optional<Entry<K, V>> parent = root.get().binarySearchInexact(key);
+        final Optional<Entry<V>> parent = root.get().binarySearchInexact(key);
         if (parent.filter(p -> p.getKey().compareTo(key) == 0).isPresent()) {
             if (parent.get().addValue(value)) {
                 size++;
@@ -83,7 +81,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
             return Optional.of(value);
         }
 
-        final Entry<K, V> entry = new Entry<>(key, value, parent);
+        final Entry<V> entry = new Entry<>(key, value, parent);
         parent.get().insertNode(entry);
         root = entry.rebalance(root);
         size++;
@@ -107,14 +105,14 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
      * @throws NullPointerException
      *             if the specified key is null
      */
-    public Optional<V> removeFirst(K low, K high, Predicate<? super V> criteria) {
-        final Optional<Entry<K, V>> entryToRemove = root.flatMap(entry -> entry.binarySearchExact(new Interval<>(low,
-                high)));
+    public Optional<V> removeFirst(long low, long high, Predicate<? super V> criteria) {
+        final Optional<Entry<V>> entryToRemove = root
+                .flatMap(entry -> entry.binarySearchExact(new Interval(low, high)));
         if (!entryToRemove.isPresent()) {
             return Optional.empty();
         }
 
-        final Entry<K, V> entry = entryToRemove.get();
+        final Entry<V> entry = entryToRemove.get();
         final Optional<V> result = entry.getValues().stream().filter(criteria).findAny();
         if (!result.isPresent()) {
             return Optional.empty();
@@ -144,7 +142,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
      * @return a read only view of the portion of this set overlapping the
      *         specified interval.
      */
-    public Iterable<V> subSet(K low, K high) {
+    public Iterable<V> subSet(long low, long high) {
         return new RangeIterable<>(this, low, high);
     }
 
@@ -157,7 +155,7 @@ public class IntervalSet<K extends Comparable<K>, V> implements Iterable<V> {
         return modifications;
     }
 
-    Optional<Entry<K, V>> getRoot() {
+    Optional<Entry<V>> getRoot() {
         return root;
     }
 }

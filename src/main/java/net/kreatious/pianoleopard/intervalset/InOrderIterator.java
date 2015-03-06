@@ -11,21 +11,21 @@ import java.util.Optional;
  *
  * @author Jay-R Studer
  */
-class InOrderIterator<K extends Comparable<K>, V> implements Iterator<V> {
-    private final IntervalSet<K, V> set;
+class InOrderIterator<V> implements Iterator<V> {
+    private final IntervalSet<V> set;
     private final int expectedModifications;
-    private Optional<Entry<K, V>> next;
+    private Optional<Entry<V>> next;
     private Optional<Iterator<V>> subiterator;
 
-    InOrderIterator(IntervalSet<K, V> set) {
+    InOrderIterator(IntervalSet<V> set) {
         this.set = set;
         expectedModifications = set.getModifications();
         next = findSmallestEntry();
         subiterator = next.map(Entry::getValues).map(Collection::iterator);
     }
 
-    private Optional<Entry<K, V>> findSmallestEntry() {
-        Optional<Entry<K, V>> leftMost = set.getRoot();
+    private Optional<Entry<V>> findSmallestEntry() {
+        Optional<Entry<V>> leftMost = set.getRoot();
         while (leftMost.flatMap(Entry::getLeft).isPresent()) {
             leftMost = leftMost.flatMap(Entry::getLeft);
         }
@@ -53,17 +53,17 @@ class InOrderIterator<K extends Comparable<K>, V> implements Iterator<V> {
         return result;
     }
 
-    private Optional<Entry<K, V>> successor(Optional<Entry<K, V>> entry) {
+    private Optional<Entry<V>> successor(Optional<Entry<V>> entry) {
         if (entry.flatMap(Entry::getRight).isPresent()) {
-            Optional<Entry<K, V>> current = entry.flatMap(Entry::getRight);
+            Optional<Entry<V>> current = entry.flatMap(Entry::getRight);
             while (current.flatMap(Entry::getLeft).isPresent()) {
                 current = current.flatMap(Entry::getLeft);
             }
             return current;
         }
 
-        Optional<Entry<K, V>> parent = entry.flatMap(Entry::getParent);
-        Optional<Entry<K, V>> child = entry;
+        Optional<Entry<V>> parent = entry.flatMap(Entry::getParent);
+        Optional<Entry<V>> child = entry;
         while (parent.flatMap(Entry::getRight).equals(child)) {
             child = parent;
             parent = parent.flatMap(Entry::getParent);

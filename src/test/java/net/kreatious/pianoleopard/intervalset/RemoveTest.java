@@ -27,23 +27,23 @@ import com.google.common.collect.Lists;
  */
 @RunWith(Parameterized.class)
 public class RemoveTest {
-    private static final Set<Interval<Integer>> INTERVALS = new HashSet<>();
+    private static final Set<Interval> INTERVALS = new HashSet<>();
     static {
         final Random rnd = new Random(311);
         for (int i = 0; i != 200; i++) {
             final int low = rnd.nextInt(25);
             final int high = low + rnd.nextInt(25);
-            INTERVALS.add(new Interval<>(low, high));
+            INTERVALS.add(new Interval(low, high));
         }
     }
 
-    private final IntervalSet<Integer, String> set = new IntervalSet<>();
+    private final IntervalSet<String> set = new IntervalSet<>();
 
     /**
      * The bounds for the test case
      */
     @Parameter(0)
-    public Interval<Integer> interval;
+    public Interval interval;
 
     /**
      * The values expected to be returned by the test
@@ -59,7 +59,7 @@ public class RemoveTest {
     @Parameters(name = "removing interval [{0}]")
     public static List<Object[]> parameters() {
         final List<Object[]> tests = new ArrayList<>();
-        for (final Interval<Integer> testInterval : INTERVALS) {
+        for (final Interval testInterval : INTERVALS) {
             final List<String> expectedValues = INTERVALS.stream().filter(interval -> !interval.equals(testInterval))
                     .map(Interval::toString).collect(toList());
             tests.add(new Object[] { testInterval, expectedValues });

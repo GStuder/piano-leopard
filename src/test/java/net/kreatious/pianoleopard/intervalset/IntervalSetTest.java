@@ -22,7 +22,7 @@ import org.junit.Test;
  * @author Jay-R Studer
  */
 public class IntervalSetTest {
-    private final IntervalSet<Integer, Integer> set = new IntervalSet<>();
+    private final IntervalSet<Integer> set = new IntervalSet<>();
 
     /**
      * Tests {@link IntervalSet#clear()}
@@ -77,7 +77,7 @@ public class IntervalSetTest {
     }
 
     /**
-     * Tests {@link IntervalSet#put(Comparable, Comparable, Object)}
+     * Tests {@link IntervalSet#put(long, long, Object)}
      */
     @Test
     public void testPut() {
