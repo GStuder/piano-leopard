@@ -1,5 +1,6 @@
 package net.kreatious.pianoleopard.keyboardselect;
 
+import java.awt.Container;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -9,13 +10,8 @@ import java.util.stream.Stream;
 import javax.sound.midi.MidiDevice;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
 
 /**
  * Provides a GUI element for selecting a MIDI Keyboard from a list of connected
@@ -61,7 +57,7 @@ class KeyboardSelector {
     }
 
     private final JComboBox<DeviceRow> keyboards = new JComboBox<>();
-    private final JPanel panel = new JPanel();
+    private final String label;
     private final Predicate<? super MidiDevice> filter;
     private final MidiDeviceFactory deviceFactory;
 
@@ -81,23 +77,30 @@ class KeyboardSelector {
      *            devices
      */
     KeyboardSelector(String label, Predicate<? super MidiDevice> filter, MidiDeviceFactory deviceFactory) {
+        this.label = label;
         this.filter = filter;
         this.deviceFactory = deviceFactory;
-
-        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.BUTTON_COLSPEC,
-                FormFactory.LABEL_COMPONENT_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, }));
-        panel.add(new JLabel(label), "1, 1, right, default");
-        panel.add(keyboards, "3, 1, fill, default");
 
         reloadDevices();
     }
 
     /**
-     * @return the {@link JPanel} associated with this control
+     * Adds this selector to the specified container.
+     * <p>
+     * The container must have a JGoodies FormLayout with 1 row and 3 columns.
+     *
+     * @param container
+     *            the container to add to
+     * @param x
+     *            the column to add to
+     * @param y
+     *            the row to add to
+     * @param width
+     *            the number of columns to take up
      */
-    JPanel getPanel() {
-        return panel;
+    void addToContainer(Container container, int x, int y, int width) {
+        container.add(new JLabel(label), x + ", " + y + ", right, default");
+        container.add(keyboards, x + 2 + ", " + y + ", " + (width - 2) + ", 1, fill, default");
     }
 
     /**

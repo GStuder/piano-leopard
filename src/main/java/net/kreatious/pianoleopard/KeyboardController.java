@@ -74,7 +74,7 @@ class KeyboardController {
         lastKeyboard.ifPresent(switchKeyboard);
 
         final SelectKeyboardDialog selectKeyboard = new SelectKeyboardDialog(lastKeyboard,
-                new SystemMidiDeviceFactory());
+                new SystemMidiDeviceFactory(), preferences);
         final JButton button = new JButton("Keyboard...");
         button.addActionListener(event -> selectKeyboard.showDialog(Optional.of(parent)).ifPresent(switchKeyboard));
         return button;

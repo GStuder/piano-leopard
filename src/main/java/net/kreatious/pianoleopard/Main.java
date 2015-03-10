@@ -55,10 +55,10 @@ public class Main {
     }
 
     private static JFrame create(OutputModel outputModel, InputModel inputModel) {
-        LightedKeyboardController.create(outputModel, inputModel);
         AntiIdle.create(inputModel);
 
         final Preferences preferences = Preferences.userNodeForPackage(Main.class);
+        LightedKeyboardController.create(preferences, outputModel, inputModel);
         final JFrame frame = new JFrame();
         frame.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                 FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,

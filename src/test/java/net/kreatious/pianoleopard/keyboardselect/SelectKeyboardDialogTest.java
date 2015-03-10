@@ -5,10 +5,12 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.prefs.Preferences;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -27,6 +29,7 @@ import org.junit.Test;
  * @author Jay-R Studer
  */
 public class SelectKeyboardDialogTest {
+    private final Preferences preferences = mock(Preferences.class);
     private final Devices devices = new Devices();
     private final MidiDevice transmitter = devices.addUnlimitedTransmitter("transmitter");
     private final MidiDevice receiver = devices.addUnlimitedReceiver("receiver");
@@ -41,7 +44,7 @@ public class SelectKeyboardDialogTest {
      */
     @Test
     public void testOK() {
-        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(Optional.empty(), devices);
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(Optional.empty(), devices, preferences);
         getComboBoxWithDevice(dialog, transmitter).setSelectedItem(new DeviceRow(transmitter));
         getComboBoxWithDevice(dialog, receiver).setSelectedItem(new DeviceRow(receiver));
         getButtonWithText(dialog, "OK").doClick();
@@ -58,7 +61,7 @@ public class SelectKeyboardDialogTest {
      */
     @Test
     public void testOKNoSelection() {
-        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices, preferences);
         getButtonWithText(dialog, "OK").doClick();
 
         final Keyboard keyboard = dialog.getKeyboard().get();
@@ -73,7 +76,7 @@ public class SelectKeyboardDialogTest {
      */
     @Test
     public void testCancelFirst() {
-        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(Optional.empty(), devices);
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(Optional.empty(), devices, preferences);
         getComboBoxWithDevice(dialog, transmitter).setSelectedItem(new DeviceRow(transmitter));
         getComboBoxWithDevice(dialog, receiver).setSelectedItem(new DeviceRow(receiver));
         getButtonWithText(dialog, "Cancel").doClick();
@@ -87,7 +90,7 @@ public class SelectKeyboardDialogTest {
      */
     @Test
     public void testCancel() {
-        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices, preferences);
         getComboBoxWithDevice(dialog, transmitter).setSelectedItem(new DeviceRow(transmitter));
         getComboBoxWithDevice(dialog, receiver).setSelectedItem(new DeviceRow(receiver));
         getButtonWithText(dialog, "Cancel").doClick();
@@ -108,7 +111,7 @@ public class SelectKeyboardDialogTest {
     }
 
     private void testShowDialogRefreshes(MidiDevice device, BiFunction<Devices, String, MidiDevice> addDevice) {
-        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices, preferences);
 
         final MidiDevice addedDevice = addDevice.apply(devices, "new device");
         final JComboBox<?> combobox = getComboBoxWithDevice(dialog, device);
@@ -131,7 +134,7 @@ public class SelectKeyboardDialogTest {
     }
 
     private void testRefresh(MidiDevice device, BiFunction<Devices, String, MidiDevice> addDevice) {
-        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices);
+        final SelectKeyboardDialog dialog = new SelectKeyboardDialog(firstSelectedKeyboard, devices, preferences);
 
         final MidiDevice addedDevice = addDevice.apply(devices, "new device");
         final JComboBox<?> combobox = getComboBoxWithDevice(dialog, device);

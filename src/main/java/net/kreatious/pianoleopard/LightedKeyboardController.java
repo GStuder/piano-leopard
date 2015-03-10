@@ -1,6 +1,9 @@
 package net.kreatious.pianoleopard;
 
+import static net.kreatious.pianoleopard.keyboardselect.LightedKeyboardSelector.NAV_CHANNEL_PREFERENCE;
+
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
@@ -25,13 +28,13 @@ import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 class LightedKeyboardController {
     private static final long OFFSET = TimeUnit.MILLISECONDS.toMicros(500);
     private static final long NOTE_GAP = TimeUnit.MILLISECONDS.toMicros(50);
-    private static final int NAVIGATION_CHANNEL = 3;
 
     private final OutputModel outputModel;
     private final Keys litKeys = new Keys();
     private final Keys keysToLight = new Keys();
 
     private volatile ParsedSequence sequence = ParsedSequence.createEmpty();
+    private int navChannel;
 
     private LightedKeyboardController(OutputModel outputModel) {
         this.outputModel = outputModel;
@@ -42,14 +45,18 @@ class LightedKeyboardController {
      * to control a lighted keyboard. After construction, keys in the current
      * sequence will light up slightly ahead of the actual song.
      *
+     * @param preferences
+     *            the preferences to listen for preference events
      * @param outputModel
      *            the {@link OutputModel} to send control events to
      * @param inputModel
      *            the {@link InputModel} to listen for user events
      * @return a new instance of {@link LightedKeyboardController}
      */
-    static LightedKeyboardController create(OutputModel outputModel, InputModel inputModel) {
+    static LightedKeyboardController create(Preferences preferences, OutputModel outputModel, InputModel inputModel) {
         final LightedKeyboardController result = new LightedKeyboardController(outputModel);
+        preferences.addPreferenceChangeListener(e -> result.navChannel = e.getNode().getInt(NAV_CHANNEL_PREFERENCE, 3));
+        result.navChannel = preferences.getInt(NAV_CHANNEL_PREFERENCE, 3);
         outputModel.addCurrentTimeListener(result::setCurrentTime);
         outputModel.addStartListener(result::setCurrentSequence);
         inputModel.addInputListener(result::onUserEvent);
@@ -65,10 +72,10 @@ class LightedKeyboardController {
             final int key = ((NoteEvent) event).getKey();
             if (event.isOn() && !litKeys.contains(key)) {
                 // User pressed an unlit key
-                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_OFF, NAVIGATION_CHANNEL, key, 127));
+                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_OFF, navChannel, key, 127));
             } else if (!event.isOn() && litKeys.contains(key)) {
                 // User released a lit key
-                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_ON, NAVIGATION_CHANNEL, key, 1));
+                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_ON, navChannel, key, 1));
             }
         } catch (final InvalidMidiDataException e) {
             // Unreachable
@@ -77,7 +84,17 @@ class LightedKeyboardController {
     }
 
     private void setCurrentSequence(ParsedSequence sequence) {
-        this.sequence = sequence;
+        try {
+            this.sequence = sequence;
+            for (int key = 0; key != 128; key++) {
+                if (litKeys.contains(key)) {
+                    outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_ON, navChannel, key, 1));
+                }
+            }
+        } catch (final InvalidMidiDataException e) {
+            // Unreachable
+            throw new IllegalStateException(e);
+        }
     }
 
     private void setCurrentTime(long time) {
@@ -112,7 +129,7 @@ class LightedKeyboardController {
         while (litKeysIt.hasNext()) {
             final int key = litKeysIt.next();
             if (!keysToLight.contains(key)) {
-                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_OFF, NAVIGATION_CHANNEL, key, 127));
+                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_OFF, navChannel, key, 127));
                 litKeysIt.remove();
             }
         }
@@ -121,7 +138,7 @@ class LightedKeyboardController {
         while (keysToLightIt.hasNext()) {
             final int key = keysToLightIt.next();
             if (!litKeys.contains(key)) {
-                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_ON, NAVIGATION_CHANNEL, key, 1));
+                outputModel.sendMessage(new ShortMessage(ShortMessage.NOTE_ON, navChannel, key, 1));
                 litKeys.add(key);
             }
         }
