@@ -16,6 +16,7 @@ import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.sequencer.InputModel;
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.sequencer.OutputModel.EventAction;
 
 /**
  * Provides support for lighted keyboards.
@@ -60,6 +61,21 @@ class LightedKeyboardController {
         outputModel.addCurrentTimeListener(result::setCurrentTime);
         outputModel.addStartListener(result::setCurrentSequence);
         inputModel.addInputListener(result::onUserEvent);
+
+        // Remap output channels if there's a conflict with navigation channel
+        outputModel.addEventHandler((message, event) -> {
+            try {
+                if (message instanceof ShortMessage && ((ShortMessage) message).getChannel() == result.navChannel
+                        && ((ShortMessage) message).getCommand() != 0xF0) {
+                    final ShortMessage msg = (ShortMessage) message;
+                    msg.setMessage(msg.getCommand(), result.navChannel == 15 ? 8 : 15, msg.getData1(), msg.getData2());
+                }
+                return EventAction.UNHANDLED;
+            } catch (final InvalidMidiDataException e) {
+                // Unreachable since msg is constructed from a valid message
+                throw new IllegalStateException(e);
+            }
+        });
         return result;
     }
 

@@ -2,10 +2,15 @@ package net.kreatious.pianoleopard;
 
 import java.awt.Component;
 import java.awt.event.ItemEvent;
+import java.util.Optional;
+import java.util.function.BiFunction;
 
+import javax.sound.midi.MidiMessage;
 import javax.swing.JToggleButton;
 
+import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.sequencer.OutputModel.EventAction;
 
 /**
  * Provides the controller for the play along action.
@@ -23,8 +28,11 @@ class PlayAlongController {
      */
     static Component create(OutputModel outputModel) {
         final JToggleButton button = new JToggleButton("Play along");
-        button.addItemListener(e -> outputModel.setPlayAlong(e.getStateChange() == ItemEvent.SELECTED));
-        button.addMouseListener(new ToggleListener(toggle -> outputModel.setPlayAlong(toggle ^ button.isSelected())));
+
+        final PlayAlongEventHandler eventHandler = new PlayAlongEventHandler();
+        button.addItemListener(e -> eventHandler.playAlong = e.getStateChange() == ItemEvent.SELECTED);
+        button.addMouseListener(new ToggleListener(toggle -> eventHandler.playAlong = toggle ^ button.isSelected()));
+        outputModel.addEventHandler(eventHandler);
 
         button.setVisible(false);
         outputModel.addStartListener(sequence -> button.setVisible(true));
@@ -32,5 +40,20 @@ class PlayAlongController {
         button.setEnabled(false);
         outputModel.addPlayListener(() -> button.setEnabled(true));
         return button;
+    }
+
+    private static class PlayAlongEventHandler implements BiFunction<MidiMessage, Optional<Event>, EventAction> {
+        boolean playAlong;
+
+        @Override
+        public EventAction apply(MidiMessage message, Optional<Event> event) {
+            if (!event.isPresent()) {
+                return EventAction.UNHANDLED;
+            } else if (playAlong) {
+                return EventAction.PLAY;
+            } else {
+                return EventAction.UNHANDLED;
+            }
+        }
     }
 }

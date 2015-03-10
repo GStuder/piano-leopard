@@ -13,6 +13,10 @@
             <action dev="jstuder" type="add" system="GitHub"
                 issue="1"> Add option to select lighted keyboard channel.
             </action>
+            <action dev="jstuder" type="add" system="GitHub"
+                issue="2"> Remap the output channels that conflict with the
+                selected lighted keyboard channel.
+            </action>
         </release>
         <release version="1.0" date="2015-03-05" description="Initial release">
             <action dev="jstuder" type="add"> Initial release of Piano

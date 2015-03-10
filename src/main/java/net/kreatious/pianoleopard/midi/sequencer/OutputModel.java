@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
@@ -23,13 +24,8 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 
 import net.kreatious.pianoleopard.midi.ParsedSequence;
-import net.kreatious.pianoleopard.midi.ParsedTrack;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventFactory;
-import net.kreatious.pianoleopard.midi.event.EventPair;
-import net.kreatious.pianoleopard.midi.event.NoteEvent;
-import net.kreatious.pianoleopard.midi.event.PedalEvent;
-import net.kreatious.pianoleopard.midi.event.Slot;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -39,17 +35,47 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Jay-R Studer
  */
 public class OutputModel implements AutoCloseable {
+    /**
+     * Indicates which action to take in response to an event handler.
+     * <p>
+     * The action with the highest priority takes precedence.
+     *
+     * @author Jay-R Studer
+     */
+    public enum EventAction {
+        /**
+         * Return if the event should be played. Has the highest priority.
+         */
+        PLAY,
+
+        /**
+         * Returned if the event should be muted. Has medium priority.
+         */
+        MUTE,
+
+        /**
+         * Returned if it doesn't matter if the event is muted. Has the lowest
+         * priority.
+         * <p>
+         * An event that is not handled by all handlers will be played.
+         * <p>
+         * Event handlers are allowed to change the MidiMessage before it is
+         * sent.
+         */
+        UNHANDLED;
+    }
+
     private static final long ALWAYS_SEND = -10;
     private final Sequencer sequencer;
     private ParsedSequence sequence = ParsedSequence.createEmpty();
     private Optional<MidiDevice> output = Optional.empty();
     private Optional<Receiver> receiver = Optional.empty();
-    private boolean playAlong;
 
     private final List<Consumer<? super Info>> outputDeviceListeners = new CopyOnWriteArrayList<>();
     private final List<Consumer<? super ParsedSequence>> startListeners = new CopyOnWriteArrayList<>();
     private final List<Runnable> playListeners = new CopyOnWriteArrayList<>();
     private final List<LongConsumer> currentTimeListeners = new CopyOnWriteArrayList<>();
+    private final List<BiFunction<MidiMessage, Optional<Event>, EventAction>> eventHandlers = new CopyOnWriteArrayList<>();
 
     private final Thread tickThread = new Thread("output model current tick thread") {
         @Override
@@ -125,7 +151,6 @@ public class OutputModel implements AutoCloseable {
     }
 
     private class MutingReceiverProxy implements Receiver {
-        private final long tolerance = TimeUnit.SECONDS.toMicros(2);
         private final Receiver wrapped;
 
         private MutingReceiverProxy(Receiver wrapped) {
@@ -136,59 +161,20 @@ public class OutputModel implements AutoCloseable {
         public void send(MidiMessage message, long timeStamp) {
             if (timeStamp == ALWAYS_SEND) {
                 wrapped.send(message, -1);
-            } else if (message instanceof ShortMessage == false) {
+                return;
+            }
+
+            final Optional<Event> event = EventFactory.create(message, sequencer.getMicrosecondPosition());
+            if (eventHandlers.stream().map(eventHandler -> eventHandler.apply(message, event)).min(Enum::compareTo)
+                    .orElse(EventAction.UNHANDLED) != EventAction.MUTE) {
                 wrapped.send(message, timeStamp);
-            } else if (EventFactory.create(message, sequencer.getMicrosecondPosition()).filter(this::isMuted)
-                    .isPresent() == false) {
-                wrapped.send(message, timeStamp);
             }
-        }
-
-        /**
-         * An event is considered muted if its {@link Slot} is not found in any
-         * inactive tracks at the current time.
-         */
-        private boolean isMuted(Event event) {
-            // Never mute a note off event
-            if (!event.isOn()) {
-                return false;
-            } else if (playAlong) {
-                return false;
-            }
-
-            for (final ParsedTrack track : sequence.getInactiveTracks()) {
-                final Iterable<? extends EventPair<? extends Event>> pairs;
-                if (event instanceof NoteEvent) {
-                    pairs = track.getNotePairs(event.getTime(), event.getTime() + tolerance);
-                } else if (event instanceof PedalEvent) {
-                    pairs = track.getPedalPairs(event.getTime(), event.getTime() + tolerance);
-                } else {
-                    return false;
-                }
-
-                for (final EventPair<? extends Event> pair : pairs) {
-                    if (pair.getSlot().equals(event.getSlot())) {
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
 
         @Override
         public void close() {
             wrapped.close();
         }
-    }
-
-    /**
-     * Sets if active tracks are not muted.
-     *
-     * @param playAlong
-     *            true if tracks are not to be muted, otherwise false.
-     */
-    public void setPlayAlong(boolean playAlong) {
-        this.playAlong = playAlong;
     }
 
     /**
@@ -288,6 +274,25 @@ public class OutputModel implements AutoCloseable {
      */
     public void addPlayListener(Runnable listener) {
         playListeners.add(listener);
+    }
+
+    /**
+     * Adds an event handler to handle MIDI events.
+     * <p>
+     * The return value of the handler determines the action to take. A list of
+     * actions is provided on {@link EventAction}. The default action is to play
+     * the event.
+     * <p>
+     * Event handlers are allowed to mutate the channel of the MidiMessage
+     * object before returning. The {@link Event} object contains the original
+     * message before any mutations are applied. Handlers are encouraged to use
+     * the Event object whenever possible.
+     *
+     * @param handler
+     *            the event handler to add.
+     */
+    public void addEventHandler(BiFunction<MidiMessage, Optional<Event>, EventAction> handler) {
+        eventHandlers.add(handler);
     }
 
     /**
