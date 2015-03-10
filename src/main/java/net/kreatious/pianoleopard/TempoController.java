@@ -42,8 +42,8 @@ class TempoController {
 
         final JPanel panel = new JPanel(new FormLayout(new ColumnSpec[] { FormFactory.DEFAULT_COLSPEC,
                 FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                FormFactory.DEFAULT_COLSPEC },
-                new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, FormFactory.DEFAULT_ROWSPEC }));
+                FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC }, new RowSpec[] {
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.DEFAULT_ROWSPEC }));
         panel.add(new JLabel("Slower"), "1, 1");
         panel.add(slider, "3, 1");
         panel.add(new JLabel("Faster"), "5, 1");

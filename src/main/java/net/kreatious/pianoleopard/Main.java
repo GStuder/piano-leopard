@@ -63,9 +63,8 @@ public class Main {
         frame.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                 FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                 FormFactory.BUTTON_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.DEFAULT_COLSPEC,
-                FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC }, new RowSpec[] {
-                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.MIN_ROWSPEC,
-                RowSpec.decode("fill:default:grow") }));
+                FormFactory.DEFAULT_COLSPEC }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.MIN_ROWSPEC, RowSpec.decode("fill:default:grow") }));
         frame.add(TempoController.create(outputModel), "8, 2, 2, 2, right, top");
         frame.add(PracticeController.create(outputModel), "6, 2");
         frame.add(OpenController.create(frame, preferences, outputModel), "4, 2");
