@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>package net.kreatious.pianoleopard.keyboardselect;<a name="line.1"></a>
+<span class="sourceLineNo">002</span><a name="line.2"></a>
+<span class="sourceLineNo">003</span>import java.awt.Container;<a name="line.3"></a>
+<span class="sourceLineNo">004</span>import java.util.prefs.Preferences;<a name="line.4"></a>
+<span class="sourceLineNo">005</span>import java.util.stream.IntStream;<a name="line.5"></a>
+<span class="sourceLineNo">006</span><a name="line.6"></a>
+<span class="sourceLineNo">007</span>import javax.swing.ImageIcon;<a name="line.7"></a>
+<span class="sourceLineNo">008</span>import javax.swing.JComboBox;<a name="line.8"></a>
+<span class="sourceLineNo">009</span>import javax.swing.JLabel;<a name="line.9"></a>
+<span class="sourceLineNo">010</span>import javax.swing.JPanel;<a name="line.10"></a>
+<span class="sourceLineNo">011</span><a name="line.11"></a>
+<span class="sourceLineNo">012</span>import com.jgoodies.forms.factories.FormFactory;<a name="line.12"></a>
+<span class="sourceLineNo">013</span>import com.jgoodies.forms.layout.ColumnSpec;<a name="line.13"></a>
+<span class="sourceLineNo">014</span>import com.jgoodies.forms.layout.FormLayout;<a name="line.14"></a>
+<span class="sourceLineNo">015</span>import com.jgoodies.forms.layout.RowSpec;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>/**<a name="line.17"></a>
+<span class="sourceLineNo">018</span> * Provides a GUI element for selecting the options of a lighted keyboard<a name="line.18"></a>
+<span class="sourceLineNo">019</span> *<a name="line.19"></a>
+<span class="sourceLineNo">020</span> * @author Jay-R Studer<a name="line.20"></a>
+<span class="sourceLineNo">021</span> */<a name="line.21"></a>
+<span class="sourceLineNo">022</span>public class LightedKeyboardSelector {<a name="line.22"></a>
+<span class="sourceLineNo">023</span>    /**<a name="line.23"></a>
+<span class="sourceLineNo">024</span>     * The preference storage location for the navigation channel.<a name="line.24"></a>
+<span class="sourceLineNo">025</span>     * &lt;p&gt;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>     * The channel is stored in the range 0..15.<a name="line.26"></a>
+<span class="sourceLineNo">027</span>     */<a name="line.27"></a>
+<span class="sourceLineNo">028</span>    public static final String NAV_CHANNEL_PREFERENCE = "navigationChannel";<a name="line.28"></a>
+<span class="sourceLineNo">029</span><a name="line.29"></a>
+<span class="sourceLineNo">030</span>    private final JComboBox&lt;Integer&gt; channels = new JComboBox&lt;&gt;(IntStream.rangeClosed(1, 16).boxed()<a name="line.30"></a>
+<span class="sourceLineNo">031</span>            .toArray(Integer[]::new));<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>    /**<a name="line.33"></a>
+<span class="sourceLineNo">034</span>     * Constructs a new {@link LightedKeyboardSelector} for selecting the<a name="line.34"></a>
+<span class="sourceLineNo">035</span>     * options of a lighted keyboard<a name="line.35"></a>
+<span class="sourceLineNo">036</span>     */<a name="line.36"></a>
+<span class="sourceLineNo">037</span>    LightedKeyboardSelector() {<a name="line.37"></a>
+<span class="sourceLineNo">038</span>    }<a name="line.38"></a>
+<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">040</span>    /**<a name="line.40"></a>
+<span class="sourceLineNo">041</span>     * Adds this selector to the specified container.<a name="line.41"></a>
+<span class="sourceLineNo">042</span>     * &lt;p&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>     * The container must have a JGoodies FormLayout with 1 row and 5 columns.<a name="line.43"></a>
+<span class="sourceLineNo">044</span>     *<a name="line.44"></a>
+<span class="sourceLineNo">045</span>     * @param container<a name="line.45"></a>
+<span class="sourceLineNo">046</span>     *            the container to add to<a name="line.46"></a>
+<span class="sourceLineNo">047</span>     * @param x<a name="line.47"></a>
+<span class="sourceLineNo">048</span>     *            the column to add to<a name="line.48"></a>
+<span class="sourceLineNo">049</span>     * @param y<a name="line.49"></a>
+<span class="sourceLineNo">050</span>     *            the row to add to<a name="line.50"></a>
+<span class="sourceLineNo">051</span>     * @param width<a name="line.51"></a>
+<span class="sourceLineNo">052</span>     *            the number of columns to take up<a name="line.52"></a>
+<span class="sourceLineNo">053</span>     */<a name="line.53"></a>
+<span class="sourceLineNo">054</span>    void addToContainer(Container container, int x, int y, int width) {<a name="line.54"></a>
+<span class="sourceLineNo">055</span>        final JPanel panel = new JPanel(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("default:grow"),<a name="line.55"></a>
+<span class="sourceLineNo">056</span>                FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },<a name="line.56"></a>
+<span class="sourceLineNo">057</span>                new RowSpec[] { FormFactory.DEFAULT_ROWSPEC }));<a name="line.57"></a>
+<span class="sourceLineNo">058</span>        final JLabel lblInfo = new JLabel(new ImageIcon(LightedKeyboardSelector.class.getResource("/help.png")));<a name="line.58"></a>
+<span class="sourceLineNo">059</span>        lblInfo.setToolTipText("&lt;html&gt;Navigation channels are used by MIDI keyboards with lighted keys.&lt;br&gt;"<a name="line.59"></a>
+<span class="sourceLineNo">060</span>                + "They determine which MIDI channel is used to light up the keys.&lt;/html&gt;");<a name="line.60"></a>
+<span class="sourceLineNo">061</span>        panel.add(channels, "1, 1");<a name="line.61"></a>
+<span class="sourceLineNo">062</span>        panel.add(lblInfo, "3, 1");<a name="line.62"></a>
+<span class="sourceLineNo">063</span><a name="line.63"></a>
+<span class="sourceLineNo">064</span>        container.add(new JLabel("Navigation Channel:"), x + ", " + y + ", right, default");<a name="line.64"></a>
+<span class="sourceLineNo">065</span>        container.add(panel, x + 2 + ", " + y + ", " + (width - 2) + ", 1, fill, default");<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    }<a name="line.66"></a>
+<span class="sourceLineNo">067</span><a name="line.67"></a>
+<span class="sourceLineNo">068</span>    /**<a name="line.68"></a>
+<span class="sourceLineNo">069</span>     * Loads the current settings from the user's preferences.<a name="line.69"></a>
+<span class="sourceLineNo">070</span>     *<a name="line.70"></a>
+<span class="sourceLineNo">071</span>     * @param preferences<a name="line.71"></a>
+<span class="sourceLineNo">072</span>     *            the preferences to load from<a name="line.72"></a>
+<span class="sourceLineNo">073</span>     */<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    void load(Preferences preferences) {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>        channels.setSelectedItem(preferences.getInt(NAV_CHANNEL_PREFERENCE, 3) + 1);<a name="line.75"></a>
+<span class="sourceLineNo">076</span>    }<a name="line.76"></a>
+<span class="sourceLineNo">077</span><a name="line.77"></a>
+<span class="sourceLineNo">078</span>    /**<a name="line.78"></a>
+<span class="sourceLineNo">079</span>     * Saves the current setting to the user's preferences.<a name="line.79"></a>
+<span class="sourceLineNo">080</span>     * &lt;p&gt;<a name="line.80"></a>
+<span class="sourceLineNo">081</span>     * Any registered preference listeners will be called.<a name="line.81"></a>
+<span class="sourceLineNo">082</span>     *<a name="line.82"></a>
+<span class="sourceLineNo">083</span>     * @param preferences<a name="line.83"></a>
+<span class="sourceLineNo">084</span>     *            the preferences to save to<a name="line.84"></a>
+<span class="sourceLineNo">085</span>     */<a name="line.85"></a>
+<span class="sourceLineNo">086</span>    void save(Preferences preferences) {<a name="line.86"></a>
+<span class="sourceLineNo">087</span>        preferences.put(NAV_CHANNEL_PREFERENCE, Integer.toString((Integer) channels.getSelectedItem() - 1));<a name="line.87"></a>
+<span class="sourceLineNo">088</span>    }<a name="line.88"></a>
+<span class="sourceLineNo">089</span>}<a name="line.89"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

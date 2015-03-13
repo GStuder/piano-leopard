@@ -35,23 +35,23 @@
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  @RunWith(Parameterized.<strong class="jxr_keyword">class</strong>)
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../net/kreatious/pianoleopard/intervalset/RemoveTest.html">RemoveTest</a> {
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Set&lt;Interval&lt;Integer&gt;&gt; INTERVALS = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Set&lt;Interval&gt; INTERVALS = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>      <strong class="jxr_keyword">static</strong> {
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>          <strong class="jxr_keyword">final</strong> Random rnd = <strong class="jxr_keyword">new</strong> Random(311);
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i != 200; i++) {
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>              <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> low = rnd.nextInt(25);
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>              <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> high = low + rnd.nextInt(25);
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>              INTERVALS.add(<strong class="jxr_keyword">new</strong> Interval&lt;&gt;(low, high));
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>              INTERVALS.add(<strong class="jxr_keyword">new</strong> Interval(low, high));
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>          }
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>      }
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;Integer, String&gt; set = <strong class="jxr_keyword">new</strong> IntervalSet&lt;&gt;();
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;String&gt; set = <strong class="jxr_keyword">new</strong> IntervalSet&lt;&gt;();
 <a class="jxr_linenumber" name="L41" href="#L41">41</a>  
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>  <em class="jxr_javadoccomment">     * The bounds for the test case</em>
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>  <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>      @Parameter(0)
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>      <strong class="jxr_keyword">public</strong> Interval&lt;Integer&gt; interval;
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      <strong class="jxr_keyword">public</strong> Interval interval;
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>  
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>  <em class="jxr_javadoccomment">     * The values expected to be returned by the test</em>
@@ -67,7 +67,7 @@
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>      @Parameters(name = <span class="jxr_string">"removing interval [{0}]"</span>)
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> List&lt;Object[]&gt; parameters() {
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>          <strong class="jxr_keyword">final</strong> List&lt;Object[]&gt; tests = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">final</strong> Interval&lt;Integer&gt; testInterval : INTERVALS) {
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">final</strong> Interval testInterval : INTERVALS) {
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>              <strong class="jxr_keyword">final</strong> List&lt;String&gt; expectedValues = INTERVALS.stream().filter(interval -&gt; !interval.equals(testInterval))
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>                      .map(Interval::toString).collect(toList());
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>              tests.add(<strong class="jxr_keyword">new</strong> Object[] { testInterval, expectedValues });

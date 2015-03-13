@@ -23,8 +23,8 @@
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_javadoccomment"> * @author Jay-R Studer</em>
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_javadoccomment"> */</em>
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">class</strong> <a href="../../../../net/kreatious/pianoleopard/midi/ImmutableParsedTrack.html">ImmutableParsedTrack</a> <strong class="jxr_keyword">implements</strong> <a href="../../../../net/kreatious/pianoleopard/midi/ParsedTrack.html">ParsedTrack</a> {
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;Long, EventPair&lt;NoteEvent&gt;&gt; notes;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;Long, EventPair&lt;PedalEvent&gt;&gt; pedals;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;EventPair&lt;NoteEvent&gt;&gt; notes;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;EventPair&lt;PedalEvent&gt;&gt; pedals;
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_javadoccomment">     * Constructs a new {@link ImmutableParsedTrack} by parsing the specified</em>

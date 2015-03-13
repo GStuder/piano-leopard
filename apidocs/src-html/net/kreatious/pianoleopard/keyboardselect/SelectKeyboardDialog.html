@@ -12,121 +12,133 @@
 <span class="sourceLineNo">004</span>import java.awt.Dialog.ModalityType;<a name="line.4"></a>
 <span class="sourceLineNo">005</span>import java.awt.event.KeyEvent;<a name="line.5"></a>
 <span class="sourceLineNo">006</span>import java.util.Optional;<a name="line.6"></a>
-<span class="sourceLineNo">007</span><a name="line.7"></a>
-<span class="sourceLineNo">008</span>import javax.swing.JButton;<a name="line.8"></a>
-<span class="sourceLineNo">009</span>import javax.swing.JDialog;<a name="line.9"></a>
-<span class="sourceLineNo">010</span>import javax.swing.JLabel;<a name="line.10"></a>
-<span class="sourceLineNo">011</span><a name="line.11"></a>
-<span class="sourceLineNo">012</span>import com.google.common.annotations.VisibleForTesting;<a name="line.12"></a>
-<span class="sourceLineNo">013</span>import com.jgoodies.forms.factories.FormFactory;<a name="line.13"></a>
-<span class="sourceLineNo">014</span>import com.jgoodies.forms.layout.ColumnSpec;<a name="line.14"></a>
-<span class="sourceLineNo">015</span>import com.jgoodies.forms.layout.FormLayout;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import com.jgoodies.forms.layout.RowSpec;<a name="line.16"></a>
-<span class="sourceLineNo">017</span><a name="line.17"></a>
-<span class="sourceLineNo">018</span>/**<a name="line.18"></a>
-<span class="sourceLineNo">019</span> * Provides the GUI for selecting the desired MIDI device<a name="line.19"></a>
-<span class="sourceLineNo">020</span> *<a name="line.20"></a>
-<span class="sourceLineNo">021</span> * @author Jay-R Studer<a name="line.21"></a>
-<span class="sourceLineNo">022</span> */<a name="line.22"></a>
-<span class="sourceLineNo">023</span>public class SelectKeyboardDialog {<a name="line.23"></a>
-<span class="sourceLineNo">024</span>    private final KeyboardSelector input;<a name="line.24"></a>
-<span class="sourceLineNo">025</span>    private final KeyboardSelector output;<a name="line.25"></a>
-<span class="sourceLineNo">026</span>    private final JDialog dialog;<a name="line.26"></a>
-<span class="sourceLineNo">027</span>    private Optional&lt;Keyboard&gt; keyboard;<a name="line.27"></a>
-<span class="sourceLineNo">028</span><a name="line.28"></a>
-<span class="sourceLineNo">029</span>    /**<a name="line.29"></a>
-<span class="sourceLineNo">030</span>     * Constructs a new {@link SelectKeyboardDialog} for selecting the desired<a name="line.30"></a>
-<span class="sourceLineNo">031</span>     * MIDI device.<a name="line.31"></a>
-<span class="sourceLineNo">032</span>     *<a name="line.32"></a>
-<span class="sourceLineNo">033</span>     * @param keyboard<a name="line.33"></a>
-<span class="sourceLineNo">034</span>     *            the original {@link Keyboard} model to display, if applicable<a name="line.34"></a>
-<span class="sourceLineNo">035</span>     * @param deviceFactory<a name="line.35"></a>
-<span class="sourceLineNo">036</span>     *            the {@link MidiDeviceFactory} for obtaining available MIDI<a name="line.36"></a>
-<span class="sourceLineNo">037</span>     *            devices<a name="line.37"></a>
-<span class="sourceLineNo">038</span>     */<a name="line.38"></a>
-<span class="sourceLineNo">039</span>    public SelectKeyboardDialog(Optional&lt;Keyboard&gt; keyboard, MidiDeviceFactory deviceFactory) {<a name="line.39"></a>
-<span class="sourceLineNo">040</span>        this.keyboard = keyboard;<a name="line.40"></a>
-<span class="sourceLineNo">041</span>        dialog = new JDialog();<a name="line.41"></a>
-<span class="sourceLineNo">042</span>        dialog.setResizable(false);<a name="line.42"></a>
-<span class="sourceLineNo">043</span>        dialog.setModalityType(ModalityType.DOCUMENT_MODAL);<a name="line.43"></a>
-<span class="sourceLineNo">044</span>        dialog.setTitle("MIDI Keyboard Selection");<a name="line.44"></a>
-<span class="sourceLineNo">045</span>        dialog.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,<a name="line.45"></a>
-<span class="sourceLineNo">046</span>                FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC,<a name="line.46"></a>
-<span class="sourceLineNo">047</span>                FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,<a name="line.47"></a>
-<span class="sourceLineNo">048</span>                FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,<a name="line.48"></a>
-<span class="sourceLineNo">049</span>                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,<a name="line.49"></a>
-<span class="sourceLineNo">050</span>                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,<a name="line.50"></a>
-<span class="sourceLineNo">051</span>                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, }));<a name="line.51"></a>
-<span class="sourceLineNo">052</span><a name="line.52"></a>
-<span class="sourceLineNo">053</span>        dialog.add(new JLabel("Select which MIDI keyboard to use"), "2, 2, 7, 1");<a name="line.53"></a>
-<span class="sourceLineNo">054</span><a name="line.54"></a>
-<span class="sourceLineNo">055</span>        input = new KeyboardSelector("Input:", device -&gt; device.getMaxTransmitters() != 0, deviceFactory);<a name="line.55"></a>
-<span class="sourceLineNo">056</span>        keyboard.map(Keyboard::getInput).ifPresent(input::setSelectedDevice);<a name="line.56"></a>
-<span class="sourceLineNo">057</span>        dialog.add(input.getPanel(), "2, 4, 7, 1");<a name="line.57"></a>
-<span class="sourceLineNo">058</span><a name="line.58"></a>
-<span class="sourceLineNo">059</span>        output = new KeyboardSelector("Output:", device -&gt; device.getMaxReceivers() != 0, deviceFactory);<a name="line.59"></a>
-<span class="sourceLineNo">060</span>        keyboard.map(Keyboard::getOutput).ifPresent(output::setSelectedDevice);<a name="line.60"></a>
-<span class="sourceLineNo">061</span>        dialog.add(output.getPanel(), "2, 6, 7, 1");<a name="line.61"></a>
-<span class="sourceLineNo">062</span><a name="line.62"></a>
-<span class="sourceLineNo">063</span>        final JButton btnOk = new JButton("OK");<a name="line.63"></a>
-<span class="sourceLineNo">064</span>        btnOk.addActionListener(event -&gt; apply());<a name="line.64"></a>
-<span class="sourceLineNo">065</span>        btnOk.addActionListener(event -&gt; dialog.dispose());<a name="line.65"></a>
-<span class="sourceLineNo">066</span>        dialog.add(btnOk, "6, 8");<a name="line.66"></a>
-<span class="sourceLineNo">067</span><a name="line.67"></a>
-<span class="sourceLineNo">068</span>        final JButton btnRefresh = new JButton("Refresh");<a name="line.68"></a>
-<span class="sourceLineNo">069</span>        btnRefresh.setMnemonic(KeyEvent.VK_R);<a name="line.69"></a>
-<span class="sourceLineNo">070</span>        btnRefresh.addActionListener(event -&gt; input.reloadDevices());<a name="line.70"></a>
-<span class="sourceLineNo">071</span>        btnRefresh.addActionListener(event -&gt; output.reloadDevices());<a name="line.71"></a>
-<span class="sourceLineNo">072</span>        dialog.add(btnRefresh, "2, 8");<a name="line.72"></a>
+<span class="sourceLineNo">007</span>import java.util.prefs.Preferences;<a name="line.7"></a>
+<span class="sourceLineNo">008</span><a name="line.8"></a>
+<span class="sourceLineNo">009</span>import javax.swing.JButton;<a name="line.9"></a>
+<span class="sourceLineNo">010</span>import javax.swing.JDialog;<a name="line.10"></a>
+<span class="sourceLineNo">011</span>import javax.swing.JLabel;<a name="line.11"></a>
+<span class="sourceLineNo">012</span><a name="line.12"></a>
+<span class="sourceLineNo">013</span>import com.google.common.annotations.VisibleForTesting;<a name="line.13"></a>
+<span class="sourceLineNo">014</span>import com.jgoodies.forms.factories.FormFactory;<a name="line.14"></a>
+<span class="sourceLineNo">015</span>import com.jgoodies.forms.layout.ColumnSpec;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import com.jgoodies.forms.layout.FormLayout;<a name="line.16"></a>
+<span class="sourceLineNo">017</span>import com.jgoodies.forms.layout.RowSpec;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>/**<a name="line.19"></a>
+<span class="sourceLineNo">020</span> * Provides the GUI for selecting the desired MIDI device<a name="line.20"></a>
+<span class="sourceLineNo">021</span> *<a name="line.21"></a>
+<span class="sourceLineNo">022</span> * @author Jay-R Studer<a name="line.22"></a>
+<span class="sourceLineNo">023</span> */<a name="line.23"></a>
+<span class="sourceLineNo">024</span>public class SelectKeyboardDialog {<a name="line.24"></a>
+<span class="sourceLineNo">025</span>    private final Preferences preferences;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>    private final KeyboardSelector input;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>    private final KeyboardSelector output;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>    private final LightedKeyboardSelector navigationChannel;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>    private final JDialog dialog;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>    private Optional&lt;Keyboard&gt; keyboard;<a name="line.30"></a>
+<span class="sourceLineNo">031</span><a name="line.31"></a>
+<span class="sourceLineNo">032</span>    /**<a name="line.32"></a>
+<span class="sourceLineNo">033</span>     * Constructs a new {@link SelectKeyboardDialog} for selecting the desired<a name="line.33"></a>
+<span class="sourceLineNo">034</span>     * MIDI device.<a name="line.34"></a>
+<span class="sourceLineNo">035</span>     *<a name="line.35"></a>
+<span class="sourceLineNo">036</span>     * @param keyboard<a name="line.36"></a>
+<span class="sourceLineNo">037</span>     *            the original {@link Keyboard} model to display, if applicable<a name="line.37"></a>
+<span class="sourceLineNo">038</span>     * @param deviceFactory<a name="line.38"></a>
+<span class="sourceLineNo">039</span>     *            the {@link MidiDeviceFactory} for obtaining available MIDI<a name="line.39"></a>
+<span class="sourceLineNo">040</span>     *            devices<a name="line.40"></a>
+<span class="sourceLineNo">041</span>     * @param preferences<a name="line.41"></a>
+<span class="sourceLineNo">042</span>     *            the preferences to store options on<a name="line.42"></a>
+<span class="sourceLineNo">043</span>     */<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    public SelectKeyboardDialog(Optional&lt;Keyboard&gt; keyboard, MidiDeviceFactory deviceFactory, Preferences preferences) {<a name="line.44"></a>
+<span class="sourceLineNo">045</span>        this.keyboard = keyboard;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>        this.preferences = preferences;<a name="line.46"></a>
+<span class="sourceLineNo">047</span>        dialog = new JDialog();<a name="line.47"></a>
+<span class="sourceLineNo">048</span>        dialog.setResizable(false);<a name="line.48"></a>
+<span class="sourceLineNo">049</span>        dialog.setModalityType(ModalityType.DOCUMENT_MODAL);<a name="line.49"></a>
+<span class="sourceLineNo">050</span>        dialog.setTitle("MIDI Keyboard Selection");<a name="line.50"></a>
+<span class="sourceLineNo">051</span>        dialog.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,<a name="line.51"></a>
+<span class="sourceLineNo">052</span>                FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC,<a name="line.52"></a>
+<span class="sourceLineNo">053</span>                FormFactory.BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.BUTTON_COLSPEC,<a name="line.53"></a>
+<span class="sourceLineNo">054</span>                FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,<a name="line.54"></a>
+<span class="sourceLineNo">055</span>                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,<a name="line.55"></a>
+<span class="sourceLineNo">056</span>                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,<a name="line.56"></a>
+<span class="sourceLineNo">057</span>                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,<a name="line.57"></a>
+<span class="sourceLineNo">058</span>                FormFactory.RELATED_GAP_ROWSPEC, }));<a name="line.58"></a>
+<span class="sourceLineNo">059</span><a name="line.59"></a>
+<span class="sourceLineNo">060</span>        dialog.add(new JLabel("Select which MIDI keyboard to use:"), "2, 2, 7, 1");<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>        input = new KeyboardSelector("Input:", device -&gt; device.getMaxTransmitters() != 0, deviceFactory);<a name="line.62"></a>
+<span class="sourceLineNo">063</span>        keyboard.map(Keyboard::getInput).ifPresent(input::setSelectedDevice);<a name="line.63"></a>
+<span class="sourceLineNo">064</span>        input.addToContainer(dialog, 2, 4, 7);<a name="line.64"></a>
+<span class="sourceLineNo">065</span><a name="line.65"></a>
+<span class="sourceLineNo">066</span>        output = new KeyboardSelector("Output:", device -&gt; device.getMaxReceivers() != 0, deviceFactory);<a name="line.66"></a>
+<span class="sourceLineNo">067</span>        keyboard.map(Keyboard::getOutput).ifPresent(output::setSelectedDevice);<a name="line.67"></a>
+<span class="sourceLineNo">068</span>        output.addToContainer(dialog, 2, 6, 7);<a name="line.68"></a>
+<span class="sourceLineNo">069</span><a name="line.69"></a>
+<span class="sourceLineNo">070</span>        navigationChannel = new LightedKeyboardSelector();<a name="line.70"></a>
+<span class="sourceLineNo">071</span>        navigationChannel.load(preferences);<a name="line.71"></a>
+<span class="sourceLineNo">072</span>        navigationChannel.addToContainer(dialog, 2, 8, 7);<a name="line.72"></a>
 <span class="sourceLineNo">073</span><a name="line.73"></a>
-<span class="sourceLineNo">074</span>        final JButton btnCancel = new JButton("Cancel");<a name="line.74"></a>
-<span class="sourceLineNo">075</span>        btnCancel.addActionListener(event -&gt; dialog.dispose());<a name="line.75"></a>
-<span class="sourceLineNo">076</span>        dialog.add(btnCancel, "8, 8");<a name="line.76"></a>
-<span class="sourceLineNo">077</span><a name="line.77"></a>
-<span class="sourceLineNo">078</span>        dialog.pack();<a name="line.78"></a>
-<span class="sourceLineNo">079</span>    }<a name="line.79"></a>
-<span class="sourceLineNo">080</span><a name="line.80"></a>
-<span class="sourceLineNo">081</span>    private void apply() {<a name="line.81"></a>
-<span class="sourceLineNo">082</span>        keyboard = Optional.of(new Keyboard(input.getSelectedDevice().get(), output.getSelectedDevice().get()));<a name="line.82"></a>
-<span class="sourceLineNo">083</span>    }<a name="line.83"></a>
+<span class="sourceLineNo">074</span>        final JButton btnOk = new JButton("OK");<a name="line.74"></a>
+<span class="sourceLineNo">075</span>        btnOk.addActionListener(event -&gt; apply());<a name="line.75"></a>
+<span class="sourceLineNo">076</span>        btnOk.addActionListener(event -&gt; dialog.dispose());<a name="line.76"></a>
+<span class="sourceLineNo">077</span>        dialog.add(btnOk, "6, 10");<a name="line.77"></a>
+<span class="sourceLineNo">078</span><a name="line.78"></a>
+<span class="sourceLineNo">079</span>        final JButton btnRefresh = new JButton("Refresh");<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        btnRefresh.setMnemonic(KeyEvent.VK_R);<a name="line.80"></a>
+<span class="sourceLineNo">081</span>        btnRefresh.addActionListener(event -&gt; input.reloadDevices());<a name="line.81"></a>
+<span class="sourceLineNo">082</span>        btnRefresh.addActionListener(event -&gt; output.reloadDevices());<a name="line.82"></a>
+<span class="sourceLineNo">083</span>        dialog.add(btnRefresh, "2, 10");<a name="line.83"></a>
 <span class="sourceLineNo">084</span><a name="line.84"></a>
-<span class="sourceLineNo">085</span>    /**<a name="line.85"></a>
-<span class="sourceLineNo">086</span>     * @return the {@link JDialog} associated with this dialog<a name="line.86"></a>
-<span class="sourceLineNo">087</span>     */<a name="line.87"></a>
-<span class="sourceLineNo">088</span>    @VisibleForTesting<a name="line.88"></a>
-<span class="sourceLineNo">089</span>    JDialog getDialog() {<a name="line.89"></a>
-<span class="sourceLineNo">090</span>        return dialog;<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    }<a name="line.91"></a>
-<span class="sourceLineNo">092</span><a name="line.92"></a>
-<span class="sourceLineNo">093</span>    /**<a name="line.93"></a>
-<span class="sourceLineNo">094</span>     * Shows the select keyboard dialog. This method blocks until a keyboard has<a name="line.94"></a>
-<span class="sourceLineNo">095</span>     * been selected.<a name="line.95"></a>
-<span class="sourceLineNo">096</span>     * &lt;p&gt;<a name="line.96"></a>
-<span class="sourceLineNo">097</span>     * If a parent is not provided, the dialog will not be shown and this method<a name="line.97"></a>
-<span class="sourceLineNo">098</span>     * returns immediately.<a name="line.98"></a>
-<span class="sourceLineNo">099</span>     *<a name="line.99"></a>
-<span class="sourceLineNo">100</span>     * @param parent<a name="line.100"></a>
-<span class="sourceLineNo">101</span>     *            the parent component to layout this dialog relative to<a name="line.101"></a>
-<span class="sourceLineNo">102</span>     * @return the selected keyboard, unless the dialog was cancelled<a name="line.102"></a>
-<span class="sourceLineNo">103</span>     */<a name="line.103"></a>
-<span class="sourceLineNo">104</span>    public Optional&lt;Keyboard&gt; showDialog(Optional&lt;Component&gt; parent) {<a name="line.104"></a>
-<span class="sourceLineNo">105</span>        parent.ifPresent(dialog::setLocationRelativeTo);<a name="line.105"></a>
-<span class="sourceLineNo">106</span><a name="line.106"></a>
-<span class="sourceLineNo">107</span>        final Optional&lt;Keyboard&gt; oldKeyboard = keyboard;<a name="line.107"></a>
-<span class="sourceLineNo">108</span>        input.reloadDevices();<a name="line.108"></a>
-<span class="sourceLineNo">109</span>        output.reloadDevices();<a name="line.109"></a>
-<span class="sourceLineNo">110</span>        dialog.setVisible(parent.isPresent());<a name="line.110"></a>
-<span class="sourceLineNo">111</span>        return oldKeyboard.equals(keyboard) ? Optional.empty() : keyboard;<a name="line.111"></a>
-<span class="sourceLineNo">112</span>    }<a name="line.112"></a>
-<span class="sourceLineNo">113</span><a name="line.113"></a>
-<span class="sourceLineNo">114</span>    /**<a name="line.114"></a>
-<span class="sourceLineNo">115</span>     * @return the selected keyboard<a name="line.115"></a>
-<span class="sourceLineNo">116</span>     */<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    @VisibleForTesting<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    Optional&lt;Keyboard&gt; getKeyboard() {<a name="line.118"></a>
-<span class="sourceLineNo">119</span>        return keyboard;<a name="line.119"></a>
-<span class="sourceLineNo">120</span>    }<a name="line.120"></a>
-<span class="sourceLineNo">121</span>}<a name="line.121"></a>
+<span class="sourceLineNo">085</span>        final JButton btnCancel = new JButton("Cancel");<a name="line.85"></a>
+<span class="sourceLineNo">086</span>        btnCancel.addActionListener(event -&gt; dialog.dispose());<a name="line.86"></a>
+<span class="sourceLineNo">087</span>        dialog.add(btnCancel, "8, 10");<a name="line.87"></a>
+<span class="sourceLineNo">088</span><a name="line.88"></a>
+<span class="sourceLineNo">089</span>        dialog.pack();<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    }<a name="line.90"></a>
+<span class="sourceLineNo">091</span><a name="line.91"></a>
+<span class="sourceLineNo">092</span>    /**<a name="line.92"></a>
+<span class="sourceLineNo">093</span>     * Shows the select keyboard dialog. This method blocks until a keyboard has<a name="line.93"></a>
+<span class="sourceLineNo">094</span>     * been selected.<a name="line.94"></a>
+<span class="sourceLineNo">095</span>     * &lt;p&gt;<a name="line.95"></a>
+<span class="sourceLineNo">096</span>     * If a parent is not provided, the dialog will not be shown and this method<a name="line.96"></a>
+<span class="sourceLineNo">097</span>     * returns immediately.<a name="line.97"></a>
+<span class="sourceLineNo">098</span>     *<a name="line.98"></a>
+<span class="sourceLineNo">099</span>     * @param parent<a name="line.99"></a>
+<span class="sourceLineNo">100</span>     *            the parent component to layout this dialog relative to<a name="line.100"></a>
+<span class="sourceLineNo">101</span>     * @return the selected keyboard, unless the dialog was cancelled<a name="line.101"></a>
+<span class="sourceLineNo">102</span>     */<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    public Optional&lt;Keyboard&gt; showDialog(Optional&lt;Component&gt; parent) {<a name="line.103"></a>
+<span class="sourceLineNo">104</span>        parent.ifPresent(dialog::setLocationRelativeTo);<a name="line.104"></a>
+<span class="sourceLineNo">105</span><a name="line.105"></a>
+<span class="sourceLineNo">106</span>        final Optional&lt;Keyboard&gt; oldKeyboard = keyboard;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>        input.reloadDevices();<a name="line.107"></a>
+<span class="sourceLineNo">108</span>        output.reloadDevices();<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        dialog.setVisible(parent.isPresent());<a name="line.109"></a>
+<span class="sourceLineNo">110</span>        return oldKeyboard.equals(keyboard) ? Optional.empty() : keyboard;<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    }<a name="line.111"></a>
+<span class="sourceLineNo">112</span><a name="line.112"></a>
+<span class="sourceLineNo">113</span>    private void apply() {<a name="line.113"></a>
+<span class="sourceLineNo">114</span>        keyboard = Optional.of(new Keyboard(input.getSelectedDevice().get(), output.getSelectedDevice().get()));<a name="line.114"></a>
+<span class="sourceLineNo">115</span>        navigationChannel.save(preferences);<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    }<a name="line.116"></a>
+<span class="sourceLineNo">117</span><a name="line.117"></a>
+<span class="sourceLineNo">118</span>    /**<a name="line.118"></a>
+<span class="sourceLineNo">119</span>     * @return the {@link JDialog} associated with this dialog<a name="line.119"></a>
+<span class="sourceLineNo">120</span>     */<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    @VisibleForTesting<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    JDialog getDialog() {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>        return dialog;<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    }<a name="line.124"></a>
+<span class="sourceLineNo">125</span><a name="line.125"></a>
+<span class="sourceLineNo">126</span>    /**<a name="line.126"></a>
+<span class="sourceLineNo">127</span>     * @return the selected keyboard<a name="line.127"></a>
+<span class="sourceLineNo">128</span>     */<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    @VisibleForTesting<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    Optional&lt;Keyboard&gt; getKeyboard() {<a name="line.130"></a>
+<span class="sourceLineNo">131</span>        return keyboard;<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    }<a name="line.132"></a>
+<span class="sourceLineNo">133</span>}<a name="line.133"></a>
 
 
 

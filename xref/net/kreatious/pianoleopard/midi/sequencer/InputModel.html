@@ -40,8 +40,8 @@
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>      <strong class="jxr_keyword">private</strong> Optional&lt;MidiDevice&gt; input = Optional.empty();
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/InputModel.html">ReceiverImpl</a> receiver = <strong class="jxr_keyword">new</strong> <a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/InputModel.html">ReceiverImpl</a>();
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;Long, EventPair&lt;NoteEvent&gt;&gt; notes = <strong class="jxr_keyword">new</strong> IntervalSet&lt;&gt;();
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;Long, EventPair&lt;PedalEvent&gt;&gt; pedals = <strong class="jxr_keyword">new</strong> IntervalSet&lt;&gt;();
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;EventPair&lt;NoteEvent&gt;&gt; notes = <strong class="jxr_keyword">new</strong> IntervalSet&lt;&gt;();
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> IntervalSet&lt;EventPair&lt;PedalEvent&gt;&gt; pedals = <strong class="jxr_keyword">new</strong> IntervalSet&lt;&gt;();
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> List&lt;Consumer&lt;? <strong class="jxr_keyword">super</strong> Info&gt;&gt; inputDeviceListeners = <strong class="jxr_keyword">new</strong> CopyOnWriteArrayList&lt;&gt;();
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> List&lt;Consumer&lt;? <strong class="jxr_keyword">super</strong> Event&gt;&gt; inputListeners = <strong class="jxr_keyword">new</strong> CopyOnWriteArrayList&lt;&gt;();
@@ -65,7 +65,7 @@
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>  <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/InputModel.html">InputModel</a> create(<a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">OutputModel</a> outputModel) <strong class="jxr_keyword">throws</strong> MidiUnavailableException {
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>          <strong class="jxr_keyword">final</strong> <a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/InputModel.html">InputModel</a> result = <strong class="jxr_keyword">new</strong> <a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/InputModel.html">InputModel</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../net/kreatious/pianoleopard/midi/sequencer/InitialMidiDevice.html">InitialMidiDevice</a>());
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>          outputModel.addStartListener(result::setCurrentSequence);
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>          outputModel.addOpenListener(result::setCurrentSequence);
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>          outputModel.addCurrentTimeListener(result.receiver::setCurrentTime);
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>          <strong class="jxr_keyword">return</strong> result;
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>      }
@@ -99,7 +99,7 @@
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>          }
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>  
 <a class="jxr_linenumber" name="L93" href="#L93">93</a>          <strong class="jxr_keyword">private</strong> &lt;K <strong class="jxr_keyword">extends</strong> Event&gt; <strong class="jxr_keyword">void</strong> userPressedEvent(K event, Map&lt;Object, K&gt; onEvents,
-<a class="jxr_linenumber" name="L94" href="#L94">94</a>                  IntervalSet&lt;Long, EventPair&lt;K&gt;&gt; fullEvents) {
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>                  IntervalSet&lt;EventPair&lt;K&gt;&gt; fullEvents) {
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>              <strong class="jxr_keyword">synchronized</strong> (fullEvents) {
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>                  <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> eventTime = event.getTime();
 <a class="jxr_linenumber" name="L97" href="#L97">97</a>                  <strong class="jxr_keyword">if</strong> (event.isOn()) {
@@ -123,7 +123,7 @@
 <a class="jxr_linenumber" name="L115" href="#L115">115</a>         }
 <a class="jxr_linenumber" name="L116" href="#L116">116</a> 
 <a class="jxr_linenumber" name="L117" href="#L117">117</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">synchronized</strong> &lt;K <strong class="jxr_keyword">extends</strong> Event&gt; Iterable&lt;EventPair&lt;K&gt;&gt; getPairs(<strong class="jxr_keyword">long</strong> low, <strong class="jxr_keyword">long</strong> high,
-<a class="jxr_linenumber" name="L118" href="#L118">118</a>                 Map&lt;Object, K&gt; onEvents, IntervalSet&lt;Long, EventPair&lt;K&gt;&gt; fullEvents) {
+<a class="jxr_linenumber" name="L118" href="#L118">118</a>                 Map&lt;Object, K&gt; onEvents, IntervalSet&lt;EventPair&lt;K&gt;&gt; fullEvents) {
 <a class="jxr_linenumber" name="L119" href="#L119">119</a>             <strong class="jxr_keyword">synchronized</strong> (fullEvents) {
 <a class="jxr_linenumber" name="L120" href="#L120">120</a>                 <strong class="jxr_keyword">final</strong> List&lt;EventPair&lt;K&gt;&gt; result = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a class="jxr_linenumber" name="L121" href="#L121">121</a>                 fullEvents.subSet(low, high).forEach(result::add);

@@ -40,8 +40,8 @@
 <span class="sourceLineNo">032</span>    private Optional&lt;MidiDevice&gt; input = Optional.empty();<a name="line.32"></a>
 <span class="sourceLineNo">033</span>    private final ReceiverImpl receiver = new ReceiverImpl();<a name="line.33"></a>
 <span class="sourceLineNo">034</span><a name="line.34"></a>
-<span class="sourceLineNo">035</span>    private final IntervalSet&lt;Long, EventPair&lt;NoteEvent&gt;&gt; notes = new IntervalSet&lt;&gt;();<a name="line.35"></a>
-<span class="sourceLineNo">036</span>    private final IntervalSet&lt;Long, EventPair&lt;PedalEvent&gt;&gt; pedals = new IntervalSet&lt;&gt;();<a name="line.36"></a>
+<span class="sourceLineNo">035</span>    private final IntervalSet&lt;EventPair&lt;NoteEvent&gt;&gt; notes = new IntervalSet&lt;&gt;();<a name="line.35"></a>
+<span class="sourceLineNo">036</span>    private final IntervalSet&lt;EventPair&lt;PedalEvent&gt;&gt; pedals = new IntervalSet&lt;&gt;();<a name="line.36"></a>
 <span class="sourceLineNo">037</span><a name="line.37"></a>
 <span class="sourceLineNo">038</span>    private final List&lt;Consumer&lt;? super Info&gt;&gt; inputDeviceListeners = new CopyOnWriteArrayList&lt;&gt;();<a name="line.38"></a>
 <span class="sourceLineNo">039</span>    private final List&lt;Consumer&lt;? super Event&gt;&gt; inputListeners = new CopyOnWriteArrayList&lt;&gt;();<a name="line.39"></a>
@@ -65,7 +65,7 @@
 <span class="sourceLineNo">057</span>     */<a name="line.57"></a>
 <span class="sourceLineNo">058</span>    public static InputModel create(OutputModel outputModel) throws MidiUnavailableException {<a name="line.58"></a>
 <span class="sourceLineNo">059</span>        final InputModel result = new InputModel(new InitialMidiDevice());<a name="line.59"></a>
-<span class="sourceLineNo">060</span>        outputModel.addStartListener(result::setCurrentSequence);<a name="line.60"></a>
+<span class="sourceLineNo">060</span>        outputModel.addOpenListener(result::setCurrentSequence);<a name="line.60"></a>
 <span class="sourceLineNo">061</span>        outputModel.addCurrentTimeListener(result.receiver::setCurrentTime);<a name="line.61"></a>
 <span class="sourceLineNo">062</span>        return result;<a name="line.62"></a>
 <span class="sourceLineNo">063</span>    }<a name="line.63"></a>
@@ -99,7 +99,7 @@
 <span class="sourceLineNo">091</span>        }<a name="line.91"></a>
 <span class="sourceLineNo">092</span><a name="line.92"></a>
 <span class="sourceLineNo">093</span>        private &lt;K extends Event&gt; void userPressedEvent(K event, Map&lt;Object, K&gt; onEvents,<a name="line.93"></a>
-<span class="sourceLineNo">094</span>                IntervalSet&lt;Long, EventPair&lt;K&gt;&gt; fullEvents) {<a name="line.94"></a>
+<span class="sourceLineNo">094</span>                IntervalSet&lt;EventPair&lt;K&gt;&gt; fullEvents) {<a name="line.94"></a>
 <span class="sourceLineNo">095</span>            synchronized (fullEvents) {<a name="line.95"></a>
 <span class="sourceLineNo">096</span>                final long eventTime = event.getTime();<a name="line.96"></a>
 <span class="sourceLineNo">097</span>                if (event.isOn()) {<a name="line.97"></a>
@@ -123,7 +123,7 @@
 <span class="sourceLineNo">115</span>        }<a name="line.115"></a>
 <span class="sourceLineNo">116</span><a name="line.116"></a>
 <span class="sourceLineNo">117</span>        private synchronized &lt;K extends Event&gt; Iterable&lt;EventPair&lt;K&gt;&gt; getPairs(long low, long high,<a name="line.117"></a>
-<span class="sourceLineNo">118</span>                Map&lt;Object, K&gt; onEvents, IntervalSet&lt;Long, EventPair&lt;K&gt;&gt; fullEvents) {<a name="line.118"></a>
+<span class="sourceLineNo">118</span>                Map&lt;Object, K&gt; onEvents, IntervalSet&lt;EventPair&lt;K&gt;&gt; fullEvents) {<a name="line.118"></a>
 <span class="sourceLineNo">119</span>            synchronized (fullEvents) {<a name="line.119"></a>
 <span class="sourceLineNo">120</span>                final List&lt;EventPair&lt;K&gt;&gt; result = new ArrayList&lt;&gt;();<a name="line.120"></a>
 <span class="sourceLineNo">121</span>                fullEvents.subSet(low, high).forEach(result::add);<a name="line.121"></a>

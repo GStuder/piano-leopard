@@ -50,8 +50,8 @@
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>  
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>          <strong class="jxr_keyword">final</strong> JPanel panel = <strong class="jxr_keyword">new</strong> JPanel(<strong class="jxr_keyword">new</strong> FormLayout(<strong class="jxr_keyword">new</strong> ColumnSpec[] { FormFactory.DEFAULT_COLSPEC,
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>                  FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>                  FormFactory.DEFAULT_COLSPEC },
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>                  <strong class="jxr_keyword">new</strong> RowSpec[] { FormFactory.DEFAULT_ROWSPEC, FormFactory.DEFAULT_ROWSPEC }));
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>                  FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC }, <strong class="jxr_keyword">new</strong> RowSpec[] {
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>                  FormFactory.DEFAULT_ROWSPEC, FormFactory.DEFAULT_ROWSPEC }));
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>          panel.add(<strong class="jxr_keyword">new</strong> JLabel(<span class="jxr_string">"Slower"</span>), <span class="jxr_string">"1, 1"</span>);
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>          panel.add(slider, <span class="jxr_string">"3, 1"</span>);
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>          panel.add(<strong class="jxr_keyword">new</strong> JLabel(<span class="jxr_string">"Faster"</span>), <span class="jxr_string">"5, 1"</span>);
@@ -61,7 +61,7 @@
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>          panel.add(lblTempo, <span class="jxr_string">"3, 2, 1, 1, center, fill"</span>);
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>  
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>          panel.setVisible(false);
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>          outputModel.addStartListener(sequence -&gt; panel.setVisible(<strong class="jxr_keyword">true</strong>));
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>          outputModel.addOpenListener(sequence -&gt; panel.setVisible(<strong class="jxr_keyword">true</strong>));
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>          <strong class="jxr_keyword">return</strong> panel;
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>      }
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>  
