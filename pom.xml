@@ -115,7 +115,7 @@
                 <version>0.11</version>
                 <executions>
                     <execution>
-                        <phase>site</phase>
+                        <phase>site-deploy</phase>
                         <goals>
                             <goal>site</goal>
                         </goals>
