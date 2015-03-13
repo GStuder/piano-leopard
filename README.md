@@ -11,7 +11,7 @@ MIDI files. It supports foot pedals as well as lighted keyboards.
 
 Installation
 ------------
-Piano Leopard can be [downloaded here](https://repo1.maven.org/maven2/net/kreatious/pianoleopard/pianoleopard/1.0/pianoleopard-1.0-jar-with-dependencies.jar)
+Piano Leopard can be [downloaded here](https://repo1.maven.org/maven2/net/kreatious/pianoleopard/pianoleopard/1.1/pianoleopard-1.1-jar-with-dependencies.jar)
 from Maven Central.
 
 You need [Java 8](http://java.com/en/) if you don't have it already, and an electronic MIDI Keyboard Controller
@@ -34,8 +34,8 @@ along with a song or artist. They do not have to be piano only. Here are a few o
 * [Javadoc](http://gstuder.github.io/piano-leopard/apidocs/index.html)
 * [Issues](../../issues)
 
-### Challenges
-* Interval Tree
+### Technical Challenges
+* Interval Tree - How to efficiently determine which rectangles to draw
 * UI Design
 * Performance optimization
 * Clean code
@@ -44,5 +44,5 @@ along with a song or artist. They do not have to be piano only. Here are a few o
 ### Contributing
 Make a pull request. For larger contributions, ask me first.
 
-[Download](https://repo1.maven.org/maven2/net/kreatious/pianoleopard/pianoleopard/1.0/pianoleopard-1.0-jar-with-dependencies.jar)
+[Download](https://repo1.maven.org/maven2/net/kreatious/pianoleopard/pianoleopard/1.1/pianoleopard-1.1-jar-with-dependencies.jar)
 =============================
