@@ -59,7 +59,7 @@ class LightedKeyboardController {
         preferences.addPreferenceChangeListener(e -> result.navChannel = e.getNode().getInt(NAV_CHANNEL_PREFERENCE, 3));
         result.navChannel = preferences.getInt(NAV_CHANNEL_PREFERENCE, 3);
         outputModel.addCurrentTimeListener(result::setCurrentTime);
-        outputModel.addStartListener(result::setCurrentSequence);
+        outputModel.addOpenListener(result::setCurrentSequence);
         inputModel.addInputListener(result::onUserEvent);
 
         // Remap output channels if there's a conflict with navigation channel

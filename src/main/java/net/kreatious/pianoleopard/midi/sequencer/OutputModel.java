@@ -1,5 +1,6 @@
 package net.kreatious.pianoleopard.midi.sequencer;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -72,10 +73,11 @@ public class OutputModel implements AutoCloseable {
     private Optional<Receiver> receiver = Optional.empty();
 
     private final List<Consumer<? super Info>> outputDeviceListeners = new CopyOnWriteArrayList<>();
-    private final List<Consumer<? super ParsedSequence>> startListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<? super ParsedSequence>> openListeners = new CopyOnWriteArrayList<>();
     private final List<Runnable> playListeners = new CopyOnWriteArrayList<>();
     private final List<LongConsumer> currentTimeListeners = new CopyOnWriteArrayList<>();
     private final List<BiFunction<MidiMessage, Optional<Event>, EventAction>> eventHandlers = new CopyOnWriteArrayList<>();
+    private final List<Closeable> closeables = new CopyOnWriteArrayList<>();
 
     private final Thread tickThread = new Thread("output model current tick thread") {
         @Override
@@ -145,7 +147,6 @@ public class OutputModel implements AutoCloseable {
         sequencer.stop();
         sequencer.setMicrosecondPosition(0);
         resetReceiver();
-        startListeners.forEach(listener -> listener.accept(sequence));
         playListeners.forEach(Runnable::run);
         sequencer.start();
     }
@@ -238,7 +239,7 @@ public class OutputModel implements AutoCloseable {
             sequencer.setSequence(sequence.getSequence());
             sequencer.setMicrosecondPosition(0);
             resetReceiver();
-            startListeners.forEach(listener -> listener.accept(sequence));
+            openListeners.forEach(listener -> listener.accept(sequence));
         } catch (final InvalidMidiDataException e) {
             throw new IOException(e);
         }
@@ -255,18 +256,17 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
-     * Adds a listener to notify when a parsed MIDI file is started from the
-     * beginning.
+     * Adds a listener to notify when a parsed MIDI file is opened.
      *
      * @param listener
      *            the listener to add
      */
-    public void addStartListener(Consumer<? super ParsedSequence> listener) {
-        startListeners.add(listener);
+    public void addOpenListener(Consumer<? super ParsedSequence> listener) {
+        openListeners.add(listener);
     }
 
     /**
-     * Adds a listener to notify when a parsed MIDI file is started from the
+     * Adds a listener to notify when a parsed MIDI file is played from the
      * beginning.
      *
      * @param listener
@@ -311,6 +311,20 @@ public class OutputModel implements AutoCloseable {
     }
 
     /**
+     * Adds a closeable to close when this output model is closed.
+     * <p>
+     * Used for releasing resources closely tied with the lifetime of this
+     * output model. Resources will be released in the same order they are
+     * registered.
+     *
+     * @param closeable
+     *            the closeable to add
+     */
+    public void addCloseable(Closeable closeable) {
+        closeables.add(closeable);
+    }
+
+    /**
      * Sends a MIDI message to the output.
      *
      * @param message
@@ -321,13 +335,29 @@ public class OutputModel implements AutoCloseable {
     }
 
     @Override
-    public void close() throws InterruptedException {
+    public void close() throws InterruptedException, IOException {
         tickThread.interrupt();
         tickThread.join();
 
         sequencer.close();
         resetReceiver();
         output.ifPresent(MidiDevice::close);
+
+        Optional<IOException> exception = Optional.empty();
+        for (final Closeable closeable : closeables) {
+            try {
+                closeable.close();
+            } catch (final IOException e) {
+                if (exception.isPresent()) {
+                    exception.get().addSuppressed(e);
+                } else {
+                    exception = Optional.of(e);
+                }
+            }
+        }
+        if (exception.isPresent()) {
+            throw exception.get();
+        }
     }
 
     private synchronized void resetReceiver() {

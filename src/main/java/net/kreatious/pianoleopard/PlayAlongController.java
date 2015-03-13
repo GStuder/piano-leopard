@@ -35,10 +35,7 @@ class PlayAlongController {
         outputModel.addEventHandler(eventHandler);
 
         button.setVisible(false);
-        outputModel.addStartListener(sequence -> button.setVisible(true));
-
-        button.setEnabled(false);
-        outputModel.addPlayListener(() -> button.setEnabled(true));
+        outputModel.addOpenListener(sequence -> button.setVisible(true));
         return button;
     }
 

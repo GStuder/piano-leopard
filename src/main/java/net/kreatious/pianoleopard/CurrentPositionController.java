@@ -30,7 +30,7 @@ class CurrentPositionController {
         scrollBar.setUnitIncrement(convertTime(TimeUnit.SECONDS.toMicros(1)));
 
         // Update track sizes
-        outputModel.addStartListener(s -> scrollBar.setMaximum(convertTime(s.getSequence().getMicrosecondLength())
+        outputModel.addOpenListener(s -> scrollBar.setMaximum(convertTime(s.getSequence().getMicrosecondLength())
                 + scrollBar.getVisibleAmount()));
         scrollBar.addComponentListener(new ComponentAdapter() {
             private final EventLayout layout = new DefaultEventLayout(scrollBar.getSize());

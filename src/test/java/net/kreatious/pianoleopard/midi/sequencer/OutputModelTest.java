@@ -57,9 +57,11 @@ public class OutputModelTest {
      *             exception is never thrown from this test
      * @throws InterruptedException
      *             if the current thread is interrupted
+     * @throws IOException
+     *             if an I/O error occurs
      */
     @Test
-    public void testClose() throws MidiUnavailableException, InterruptedException {
+    public void testClose() throws MidiUnavailableException, InterruptedException, IOException {
         outputModel.close();
 
         final InOrder order = inOrder(output, sequencer);
@@ -78,9 +80,11 @@ public class OutputModelTest {
      *             exception is never thrown from this test
      * @throws InterruptedException
      *             if the current thread is interrupted
+     * @throws IOException
+     *             if an I/O error occurs
      */
     @Test
-    public void testSetKeyboard() throws MidiUnavailableException, InterruptedException {
+    public void testSetKeyboard() throws MidiUnavailableException, InterruptedException, IOException {
         outputModel.setOutputDevice(output);
         outputModel.close();
 
@@ -108,15 +112,15 @@ public class OutputModelTest {
      */
     @Test
     public void testStart() throws IOException, InvalidMidiDataException, InterruptedException {
-        final Consumer<ParsedSequence> startListener = mock(Consumer.class);
-        outputModel.addStartListener(startListener);
+        final Consumer<ParsedSequence> openListener = mock(Consumer.class);
+        outputModel.addOpenListener(openListener);
         outputModel.openMidiFile(ClassLoader.getSystemResourceAsStream("grieg_hallofking.mid"), Optional.empty());
         outputModel.start();
         outputModel.close();
 
-        final InOrder order = inOrder(startListener, sequencer);
+        final InOrder order = inOrder(openListener, sequencer);
         order.verify(sequencer).setSequence(any(Sequence.class));
-        order.verify(startListener).accept(any());
+        order.verify(openListener).accept(any());
         order.verify(sequencer).setMicrosecondPosition(0);
         order.verify(sequencer).start();
         order.verify(sequencer).close();
@@ -173,15 +177,11 @@ public class OutputModelTest {
     /**
      * Tests for {@link OutputModel#sendMessage}
      *
-     * @throws MidiUnavailableException
-     *             exception is never thrown from this test
-     * @throws InvalidMidiDataException
-     *             exception is never thrown from this test
-     * @throws InterruptedException
-     *             if the current thread is interrupted
+     * @throws Exception
+     *             if an error occurs during the test
      */
     @Test
-    public void testSendMessage() throws MidiUnavailableException, InvalidMidiDataException, InterruptedException {
+    public void testSendMessage() throws Exception {
         final ShortMessage message = new ShortMessage(ShortMessage.SYSTEM_RESET);
         outputModel.setOutputDevice(output);
         outputModel.sendMessage(message);

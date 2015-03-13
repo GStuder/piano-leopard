@@ -22,20 +22,22 @@ class PracticeController {
      * Constructs a view and associates it with its controller
      */
     static Component create(OutputModel outputModel) {
-        final JButton button = new JButton("Practice");
-        outputModel.addStartListener(sequence -> updateText(button, sequence));
-        outputModel.addStartListener(sequence -> button.setEnabled(true));
-        button.addActionListener(e -> outputModel.start());
-        button.setEnabled(false);
-        return button;
+        final JButton practiceButton = new JButton("Practice");
+        outputModel.addOpenListener(sequence -> {
+            updateText(practiceButton, sequence);
+            practiceButton.setEnabled(true);
+        });
+        practiceButton.addActionListener(e -> outputModel.start());
+        practiceButton.setEnabled(false);
+        return practiceButton;
     }
 
-    private static void updateText(JButton button, ParsedSequence sequence) {
+    private static void updateText(JButton practiceButton, ParsedSequence sequence) {
         final Optional<String> fileName = sequence.getFile().map(File::getName);
         if (fileName.isPresent()) {
-            button.setText("Practice " + fileName.get());
+            practiceButton.setText("Practice " + fileName.get());
         } else {
-            button.setText("Practice");
+            practiceButton.setText("Practice");
         }
     }
 }

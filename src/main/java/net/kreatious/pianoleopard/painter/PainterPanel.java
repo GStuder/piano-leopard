@@ -66,7 +66,7 @@ public class PainterPanel {
     public static JPanel create(OutputModel outputModel, InputModel inputModel) {
         final PainterPanel result = new PainterPanel(inputModel);
         outputModel.addCurrentTimeListener(result::setCurrentTime);
-        outputModel.addStartListener(result::setCurrentSequence);
+        outputModel.addOpenListener(result::setCurrentSequence);
         return result.getPanel();
     }
 

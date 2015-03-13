@@ -53,7 +53,7 @@ class TempoController {
         panel.add(lblTempo, "3, 2, 1, 1, center, fill");
 
         panel.setVisible(false);
-        outputModel.addStartListener(sequence -> panel.setVisible(true));
+        outputModel.addOpenListener(sequence -> panel.setVisible(true));
         return panel;
     }
 

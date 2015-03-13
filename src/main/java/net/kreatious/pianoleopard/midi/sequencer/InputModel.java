@@ -57,7 +57,7 @@ public class InputModel implements AutoCloseable, ParsedTrack {
      */
     public static InputModel create(OutputModel outputModel) throws MidiUnavailableException {
         final InputModel result = new InputModel(new InitialMidiDevice());
-        outputModel.addStartListener(result::setCurrentSequence);
+        outputModel.addOpenListener(result::setCurrentSequence);
         outputModel.addCurrentTimeListener(result.receiver::setCurrentTime);
         return result;
     }

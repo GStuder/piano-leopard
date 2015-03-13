@@ -39,22 +39,22 @@ class PracticeTrackController {
      */
     static Component create(OutputModel outputModel) {
         final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        outputModel.addStartListener(new StartListener(panel));
+        outputModel.addOpenListener(new OpenListener(panel));
         PracticeTrackEventHandler.create(outputModel);
         return panel;
     }
 
     /**
-     * Reconstructs the panel's buttons when a new song is started.
+     * Reconstructs the panel's buttons when a new song is opened.
      *
      * @author Jay-R Studer
      */
-    private static final class StartListener implements Consumer<ParsedSequence> {
+    private static final class OpenListener implements Consumer<ParsedSequence> {
         private final JPanel panel;
         private static final Predicate<ParsedTrack> CONTAINS_NOTES = track -> track.getNotePairs(0, Long.MAX_VALUE)
                 .iterator().hasNext();
 
-        private StartListener(JPanel panel) {
+        private OpenListener(JPanel panel) {
             this.panel = panel;
         }
 
@@ -85,7 +85,7 @@ class PracticeTrackController {
 
         static void create(OutputModel outputModel) {
             final PracticeTrackEventHandler eventHandler = new PracticeTrackEventHandler();
-            outputModel.addStartListener(sequence -> eventHandler.sequence = sequence);
+            outputModel.addOpenListener(sequence -> eventHandler.sequence = sequence);
             outputModel.addEventHandler(eventHandler);
         }
 
