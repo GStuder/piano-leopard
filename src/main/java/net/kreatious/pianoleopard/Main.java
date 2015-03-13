@@ -4,6 +4,8 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -12,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import net.kreatious.pianoleopard.history.History;
 import net.kreatious.pianoleopard.keyboardselect.SelectKeyboardDialog;
 import net.kreatious.pianoleopard.midi.sequencer.InputModel;
 import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
@@ -75,6 +78,8 @@ public class Main {
         final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.add(PracticeTrackController.create(outputModel));
         panel.add(PlayAlongController.create(outputModel));
+        panel.add(PracticeTimeController.create(History.create(new File("log.dat"), outputModel, inputModel),
+                outputModel));
         frame.add(panel, "2, 3, 6, 1");
 
         frame.pack();
@@ -86,6 +91,8 @@ public class Main {
                     inputModel.close();
                 } catch (final InterruptedException ex) {
                     Thread.currentThread().interrupt();
+                } catch (final IOException ex) {
+                    ex.printStackTrace();
                 }
             }
         });

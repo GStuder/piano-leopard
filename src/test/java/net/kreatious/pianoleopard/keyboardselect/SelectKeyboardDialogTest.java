@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 import javax.sound.midi.MidiDevice;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
 
 import net.kreatious.pianoleopard.keyboardselect.KeyboardSelector.DeviceRow;
 
@@ -154,8 +153,6 @@ public class SelectKeyboardDialogTest {
 
     private static JComboBox<?> getComboBoxWithDevice(SelectKeyboardDialog dialog, MidiDevice device) {
         return Stream.of(dialog.getDialog().getContentPane().getComponents())
-                .filter(component -> component instanceof JPanel).map(component -> (JPanel) component)
-                .flatMap(panel -> Stream.of(panel.getComponents()))
                 .filter(component -> component instanceof JComboBox<?>).map(component -> (JComboBox<?>) component)
                 .filter(comboBox -> getDevices(comboBox).contains(device)).findFirst().get();
     }

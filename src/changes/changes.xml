@@ -17,6 +17,9 @@
                 issue="2"> Remap the output channels that conflict with the
                 selected lighted keyboard channel.
             </action>
+            <action dev="jstuder" type="add"> Add feature to track the
+                number of times a file was practiced.
+            </action>
         </release>
         <release version="1.0" date="2015-03-05" description="Initial release">
             <action dev="jstuder" type="add"> Initial release of Piano
