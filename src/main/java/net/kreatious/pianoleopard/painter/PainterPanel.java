@@ -8,10 +8,10 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JPanel;
 
-import net.kreatious.pianoleopard.midi.ParsedSequence;
-import net.kreatious.pianoleopard.midi.ParsedTrack;
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
+import net.kreatious.pianoleopard.midi.track.ParsedTrack;
 
 /**
  * Renders the currently playing sequence into a panel using double buffering.

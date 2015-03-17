@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi;
+package net.kreatious.pianoleopard.midi.track;
 
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;

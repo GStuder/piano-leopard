@@ -12,11 +12,11 @@ import java.util.Optional;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
 
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
 
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;

@@ -16,9 +16,9 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import net.kreatious.pianoleopard.history.History;
 import net.kreatious.pianoleopard.keyboardselect.SelectKeyboardDialog;
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
-import net.kreatious.pianoleopard.midi.sequencer.SystemSequencerFactory;
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
+import net.kreatious.pianoleopard.midi.SystemSequencerFactory;
 import net.kreatious.pianoleopard.painter.PainterPanel;
 
 import com.jgoodies.forms.factories.FormFactory;

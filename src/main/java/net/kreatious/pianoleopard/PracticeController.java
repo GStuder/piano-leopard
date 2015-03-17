@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import javax.swing.JButton;
 
-import net.kreatious.pianoleopard.midi.ParsedSequence;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
 
 /**
  * Provides the controller for the practice action.

@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard.midi;
 
 import java.util.Collections;
 import java.util.List;

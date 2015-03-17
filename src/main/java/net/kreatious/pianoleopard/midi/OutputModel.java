@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard.midi;
 
 import java.io.Closeable;
 import java.io.File;
@@ -24,9 +24,9 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 
-import net.kreatious.pianoleopard.midi.ParsedSequence;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventFactory;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
 
 import com.google.common.annotations.VisibleForTesting;
 

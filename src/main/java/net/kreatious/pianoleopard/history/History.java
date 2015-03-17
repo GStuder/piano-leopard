@@ -7,8 +7,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Optional;
 
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 
 /**
  * Provides a history of user events.

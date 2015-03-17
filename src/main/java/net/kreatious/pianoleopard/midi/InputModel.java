@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard.midi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,13 +15,13 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 
 import net.kreatious.pianoleopard.intervalset.IntervalSet;
-import net.kreatious.pianoleopard.midi.ParsedSequence;
-import net.kreatious.pianoleopard.midi.ParsedTrack;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventFactory;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
+import net.kreatious.pianoleopard.midi.track.ParsedTrack;
 
 /**
  * Model for the MIDI input keyboard, allows controllers to listen for events.

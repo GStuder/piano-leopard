@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard.midi;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -22,7 +22,8 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Transmitter;
 
-import net.kreatious.pianoleopard.midi.ParsedSequence;
+import net.kreatious.pianoleopard.midi.OutputModel;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
 
 import org.junit.Test;
 import org.mockito.InOrder;

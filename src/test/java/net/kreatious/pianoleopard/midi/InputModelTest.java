@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard.midi;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -21,6 +21,8 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Transmitter;
 
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 import net.kreatious.pianoleopard.painter.layout.DefaultEventLayout;
 import net.kreatious.pianoleopard.painter.layout.EventLayout;
 

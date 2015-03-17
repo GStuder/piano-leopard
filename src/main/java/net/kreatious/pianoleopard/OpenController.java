@@ -13,7 +13,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 
 /**
  * Provides the controller for the open action

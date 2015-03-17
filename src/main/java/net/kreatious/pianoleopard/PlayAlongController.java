@@ -8,9 +8,9 @@ import java.util.function.BiFunction;
 import javax.sound.midi.MidiMessage;
 import javax.swing.JToggleButton;
 
+import net.kreatious.pianoleopard.midi.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel.EventAction;
 import net.kreatious.pianoleopard.midi.event.Event;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel.EventAction;
 
 /**
  * Provides the controller for the play along action.

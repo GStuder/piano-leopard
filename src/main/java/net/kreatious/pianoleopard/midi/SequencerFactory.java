@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi.sequencer;
+package net.kreatious.pianoleopard.midi;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;

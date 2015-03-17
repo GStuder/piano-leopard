@@ -9,14 +9,14 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
 
 import net.kreatious.pianoleopard.Keys.KeyIterator;
-import net.kreatious.pianoleopard.midi.ParsedSequence;
-import net.kreatious.pianoleopard.midi.ParsedTrack;
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel.EventAction;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel.EventAction;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
+import net.kreatious.pianoleopard.midi.track.ParsedTrack;
 
 /**
  * Provides support for lighted keyboards.

@@ -2,9 +2,9 @@ package net.kreatious.pianoleopard;
 
 import java.util.function.Consumer;
 
+import net.kreatious.pianoleopard.midi.InputModel;
 import net.kreatious.pianoleopard.midi.event.Event;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
 
 import com.sun.jna.Native;
 import com.sun.jna.Platform;

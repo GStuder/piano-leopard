@@ -1,4 +1,4 @@
-package net.kreatious.pianoleopard.midi;
+package net.kreatious.pianoleopard.midi.track;
 
 import java.util.HashMap;
 import java.util.Map;

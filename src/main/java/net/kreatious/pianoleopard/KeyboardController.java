@@ -13,8 +13,8 @@ import javax.swing.JOptionPane;
 import net.kreatious.pianoleopard.keyboardselect.Keyboard;
 import net.kreatious.pianoleopard.keyboardselect.SelectKeyboardDialog;
 import net.kreatious.pianoleopard.keyboardselect.SystemMidiDeviceFactory;
-import net.kreatious.pianoleopard.midi.sequencer.InputModel;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.InputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 
 /**
  * Provides the controller for the keyboard action

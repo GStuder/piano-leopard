@@ -4,10 +4,10 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
-import net.kreatious.pianoleopard.midi.ParsedTrack;
 import net.kreatious.pianoleopard.midi.event.EventPair;
 import net.kreatious.pianoleopard.midi.event.NoteEvent;
 import net.kreatious.pianoleopard.midi.event.PedalEvent;
+import net.kreatious.pianoleopard.midi.track.ParsedTrack;
 import net.kreatious.pianoleopard.painter.layout.DefaultEventLayout;
 import net.kreatious.pianoleopard.painter.layout.EventLayout;
 import net.kreatious.pianoleopard.painter.layout.InactiveEventLayout;

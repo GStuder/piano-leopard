@@ -1,5 +1,5 @@
 /**
- * Data model for a parsed MIDI sequence
+ * Data models backed by physical MIDI sequencer devices
  *
  * @author Jay-R Studer
  */

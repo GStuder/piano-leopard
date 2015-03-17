@@ -3,8 +3,8 @@ package net.kreatious.pianoleopard.painter;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 
-import net.kreatious.pianoleopard.midi.ParsedSequence;
-import net.kreatious.pianoleopard.midi.ParsedTrack;
+import net.kreatious.pianoleopard.midi.track.ParsedSequence;
+import net.kreatious.pianoleopard.midi.track.ParsedTrack;
 
 /**
  * Paints a sequence of notes into a graphics context

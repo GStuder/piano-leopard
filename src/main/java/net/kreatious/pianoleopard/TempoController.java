@@ -6,7 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.jgoodies.forms.factories.FormFactory;

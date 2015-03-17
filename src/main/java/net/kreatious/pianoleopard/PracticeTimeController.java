@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 
 import net.kreatious.pianoleopard.history.History;
 import net.kreatious.pianoleopard.history.HistoryVisitor;
-import net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+import net.kreatious.pianoleopard.midi.OutputModel;
 
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
