@@ -6,6 +6,11 @@
         <author email="jstuder@kreatious.net">Jay-R Studer</author>
     </properties>
     <body>
+        <release version="1.1.1" date="2015-03-17" description="Enhancement release">
+            <action dev="jstuder" type="fix"> Fix played notes not
+                being removed when restarting the current song.
+            </action>
+        </release>
         <release version="1.1" date="2015-03-13" description="Enhancement release">
             <action dev="jstuder" type="update"> Performance improvements
                 to reduce memory consumption rate.

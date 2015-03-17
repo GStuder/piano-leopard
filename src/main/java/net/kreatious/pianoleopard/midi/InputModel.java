@@ -30,7 +30,7 @@ import net.kreatious.pianoleopard.midi.track.ParsedTrack;
  */
 public class InputModel implements AutoCloseable, ParsedTrack {
     private Optional<MidiDevice> input = Optional.empty();
-    private final ReceiverImpl receiver = new ReceiverImpl();
+    private final UserNoteRecorder userRecorder = new UserNoteRecorder();
 
     private final IntervalSet<EventPair<NoteEvent>> notes = new IntervalSet<>();
     private final IntervalSet<EventPair<PedalEvent>> pedals = new IntervalSet<>();
@@ -56,17 +56,18 @@ public class InputModel implements AutoCloseable, ParsedTrack {
      *             if the MIDI system is unavailable.
      */
     public static InputModel create(OutputModel outputModel) throws MidiUnavailableException {
-        final InputModel result = new InputModel(new InitialMidiDevice());
-        outputModel.addOpenListener(result::setCurrentSequence);
-        outputModel.addCurrentTimeListener(result.receiver::setCurrentTime);
-        return result;
+        final InputModel input = new InputModel(new InitialMidiDevice());
+        outputModel.addOpenListener(input::setCurrentSequence);
+        outputModel.addPlayListener(input.userRecorder::clear);
+        outputModel.addCurrentTimeListener(input.userRecorder::setCurrentTime);
+        return input;
     }
 
     private void setCurrentSequence(@SuppressWarnings("unused") ParsedSequence sequence) {
-        receiver.clear();
+        userRecorder.clear();
     }
 
-    private final class ReceiverImpl implements Receiver, ParsedTrack {
+    private final class UserNoteRecorder implements Receiver, ParsedTrack {
         private final Map<Object, NoteEvent> onNotes = new HashMap<>();
         private final Map<Object, PedalEvent> onPedals = new HashMap<>();
 
@@ -154,8 +155,8 @@ public class InputModel implements AutoCloseable, ParsedTrack {
         this.input = Optional.of(input);
 
         input.open();
-        input.getTransmitter().setReceiver(receiver);
-        receiver.clear();
+        input.getTransmitter().setReceiver(userRecorder);
+        userRecorder.clear();
         inputDeviceListeners.forEach(listener -> listener.accept(input.getDeviceInfo()));
     }
 
@@ -186,11 +187,11 @@ public class InputModel implements AutoCloseable, ParsedTrack {
 
     @Override
     public Iterable<EventPair<NoteEvent>> getNotePairs(long low, long high) {
-        return receiver.getNotePairs(low, high);
+        return userRecorder.getNotePairs(low, high);
     }
 
     @Override
     public Iterable<EventPair<PedalEvent>> getPedalPairs(long low, long high) {
-        return receiver.getPedalPairs(low, high);
+        return userRecorder.getPedalPairs(low, high);
     }
 }
