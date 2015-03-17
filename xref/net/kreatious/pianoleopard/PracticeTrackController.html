@@ -23,15 +23,15 @@
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> javax.swing.JPanel;
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> javax.swing.JToggleButton;
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.ParsedSequence;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.ParsedTrack;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.OutputModel;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.OutputModel.EventAction;
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.Event;
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.EventPair;
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.NoteEvent;
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.PedalEvent;
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.Slot;
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.OutputModel;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.OutputModel.EventAction;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.track.ParsedSequence;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.track.ParsedTrack;
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment"> * Provides the controller for altering which tracks are being practiced.</em>
@@ -45,7 +45,7 @@
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  <em class="jxr_javadoccomment">     * Constructs a view and associates it with its controller</em>
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">static</strong> Component create(<a href="../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">OutputModel</a> outputModel) {
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">static</strong> Component create(<a href="../../../net/kreatious/pianoleopard/midi/OutputModel.html">OutputModel</a> outputModel) {
 <a class="jxr_linenumber" name="L41" href="#L41">41</a>          <strong class="jxr_keyword">final</strong> JPanel panel = <strong class="jxr_keyword">new</strong> JPanel(<strong class="jxr_keyword">new</strong> FlowLayout(FlowLayout.LEFT));
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>          outputModel.addOpenListener(<strong class="jxr_keyword">new</strong> <a href="../../../net/kreatious/pianoleopard/PracticeTrackController.html">OpenListener</a>(panel));
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>          PracticeTrackEventHandler.create(outputModel);
@@ -67,7 +67,7 @@
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>          }
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>  
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>          @Override
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>          <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> accept(<a href="../../../net/kreatious/pianoleopard/midi/ParsedSequence.html">ParsedSequence</a> sequence) {
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>          <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> accept(<a href="../../../net/kreatious/pianoleopard/midi/track/ParsedSequence.html">ParsedSequence</a> sequence) {
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>              panel.removeAll();
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>              panel.add(<strong class="jxr_keyword">new</strong> JLabel(<span class="jxr_string">"Tracks:"</span>));
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>              sequence.getTracks().stream().filter(CONTAINS_NOTES)
@@ -75,7 +75,7 @@
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>              panel.revalidate();
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>          }
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>  
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>          <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Component createButton(<a href="../../../net/kreatious/pianoleopard/midi/ParsedSequence.html">ParsedSequence</a> sequence, <a href="../../../net/kreatious/pianoleopard/midi/ParsedTrack.html">ParsedTrack</a> track) {
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>          <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Component createButton(<a href="../../../net/kreatious/pianoleopard/midi/track/ParsedSequence.html">ParsedSequence</a> sequence, <a href="../../../net/kreatious/pianoleopard/midi/track/ParsedTrack.html">ParsedTrack</a> track) {
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>              <strong class="jxr_keyword">final</strong> JToggleButton button = <strong class="jxr_keyword">new</strong> JToggleButton();
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>              button.setMargin(<strong class="jxr_keyword">new</strong> Insets(8, 8, 8, 8));
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>              button.addItemListener(e -&gt; sequence.setTrackActive(track, e.getStateChange() == ItemEvent.SELECTED));
@@ -89,9 +89,9 @@
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> <a href="../../../net/kreatious/pianoleopard/PracticeTrackController.html">PracticeTrackEventHandler</a> <strong class="jxr_keyword">implements</strong>
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>              BiFunction&lt;MidiMessage, Optional&lt;Event&gt;, EventAction&gt; {
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>          <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> TOLERANCE = TimeUnit.SECONDS.toMicros(2);
-<a class="jxr_linenumber" name="L84" href="#L84">84</a>          <strong class="jxr_keyword">private</strong> <a href="../../../net/kreatious/pianoleopard/midi/ParsedSequence.html">ParsedSequence</a> sequence = ParsedSequence.createEmpty();
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>          <strong class="jxr_keyword">private</strong> <a href="../../../net/kreatious/pianoleopard/midi/track/ParsedSequence.html">ParsedSequence</a> sequence = ParsedSequence.createEmpty();
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>  
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>          <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> create(<a href="../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">OutputModel</a> outputModel) {
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>          <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> create(<a href="../../../net/kreatious/pianoleopard/midi/OutputModel.html">OutputModel</a> outputModel) {
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>              <strong class="jxr_keyword">final</strong> <a href="../../../net/kreatious/pianoleopard/PracticeTrackController.html">PracticeTrackEventHandler</a> eventHandler = <strong class="jxr_keyword">new</strong> <a href="../../../net/kreatious/pianoleopard/PracticeTrackController.html">PracticeTrackEventHandler</a>();
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>              outputModel.addOpenListener(sequence -&gt; eventHandler.sequence = sequence);
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>              outputModel.addEventHandler(eventHandler);
@@ -102,7 +102,7 @@
 <a class="jxr_linenumber" name="L94" href="#L94">94</a>  <em class="jxr_javadoccomment">         * inactive tracks at the current time.</em>
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>  <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>          @Override
-<a class="jxr_linenumber" name="L97" href="#L97">97</a>          <strong class="jxr_keyword">public</strong> <a href="../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">EventAction</a> apply(MidiMessage message, Optional&lt;Event&gt; optionalEvent) {
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>          <strong class="jxr_keyword">public</strong> <a href="../../../net/kreatious/pianoleopard/midi/OutputModel.html">EventAction</a> apply(MidiMessage message, Optional&lt;Event&gt; optionalEvent) {
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>              <strong class="jxr_keyword">if</strong> (!optionalEvent.isPresent()) {
 <a class="jxr_linenumber" name="L99" href="#L99">99</a>                  <strong class="jxr_keyword">return</strong> EventAction.UNHANDLED;
 <a class="jxr_linenumber" name="L100" href="#L100">100</a>             }

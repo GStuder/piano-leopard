@@ -20,11 +20,11 @@
 <a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> javax.sound.midi.InvalidMidiDataException;
 <a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> javax.sound.midi.ShortMessage;
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.Event;
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.NoteEvent;
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.PedalEvent;
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.InputModel;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.InputModel;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.OutputModel;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.Event;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.NoteEvent;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.PedalEvent;
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> com.google.common.hash.Hashing;
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> com.google.common.io.Files;
@@ -140,7 +140,7 @@
 <a class="jxr_linenumber" name="L132" href="#L132">132</a> <em class="jxr_javadoccomment">     * @return a new {@link LogWriter} if the log file can be written to,</em>
 <a class="jxr_linenumber" name="L133" href="#L133">133</a> <em class="jxr_javadoccomment">     *         otherwise an empty object.</em>
 <a class="jxr_linenumber" name="L134" href="#L134">134</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L135" href="#L135">135</a>     <strong class="jxr_keyword">static</strong> Optional&lt;LogWriter&gt; create(FileChannel channel, <a href="../../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">OutputModel</a> outputModel, <a href="../../../../net/kreatious/pianoleopard/midi/sequencer/InputModel.html">InputModel</a> inputModel) {
+<a class="jxr_linenumber" name="L135" href="#L135">135</a>     <strong class="jxr_keyword">static</strong> Optional&lt;LogWriter&gt; create(FileChannel channel, <a href="../../../../net/kreatious/pianoleopard/midi/OutputModel.html">OutputModel</a> outputModel, <a href="../../../../net/kreatious/pianoleopard/midi/InputModel.html">InputModel</a> inputModel) {
 <a class="jxr_linenumber" name="L136" href="#L136">136</a>         <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L137" href="#L137">137</a>             <strong class="jxr_keyword">final</strong> <a href="../../../../net/kreatious/pianoleopard/history/LogWriter.html">LogWriter</a> logger = <strong class="jxr_keyword">new</strong> <a href="../../../../net/kreatious/pianoleopard/history/LogWriter.html">LogWriter</a>(channel);
 <a class="jxr_linenumber" name="L138" href="#L138">138</a>             logger.logHeader();

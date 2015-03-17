@@ -11,8 +11,8 @@
 <a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> java.awt.Dimension;
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <strong class="jxr_keyword">import</strong> java.awt.Graphics2D;
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   
-<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.ParsedSequence;
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.ParsedTrack;
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.track.ParsedSequence;
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.track.ParsedTrack;
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_javadoccomment"> * Paints a sequence of notes into a graphics context</em>
@@ -53,7 +53,7 @@
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>  <em class="jxr_javadoccomment">     * @param playedTrack</em>
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>  <em class="jxr_javadoccomment">     *            the track of events receiving notes played by the user</em>
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">void</strong> paint(Graphics2D graphics, <strong class="jxr_keyword">long</strong> currentTime, <a href="../../../../net/kreatious/pianoleopard/midi/ParsedSequence.html">ParsedSequence</a> sequence, <a href="../../../../net/kreatious/pianoleopard/midi/ParsedTrack.html">ParsedTrack</a> playedTrack) {
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">void</strong> paint(Graphics2D graphics, <strong class="jxr_keyword">long</strong> currentTime, <a href="../../../../net/kreatious/pianoleopard/midi/track/ParsedSequence.html">ParsedSequence</a> sequence, <a href="../../../../net/kreatious/pianoleopard/midi/track/ParsedTrack.html">ParsedTrack</a> playedTrack) {
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>          backgroundPainter.paint(graphics);
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>  
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">final</strong> ParsedTrack track : sequence.getInactiveTracks()) {

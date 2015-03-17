@@ -21,7 +21,7 @@
 <a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> javax.swing.JOptionPane;
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> javax.swing.filechooser.FileFilter;
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>  
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.OutputModel;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.OutputModel;
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_javadoccomment"> * Provides the controller for the open action</em>
@@ -37,7 +37,7 @@
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  <em class="jxr_javadoccomment">     * Constructs a view and associates it with its controller</em>
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>      <strong class="jxr_keyword">static</strong> Component create(Component parent, Preferences preferences, <a href="../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">OutputModel</a> outputModel) {
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>      <strong class="jxr_keyword">static</strong> Component create(Component parent, Preferences preferences, <a href="../../../net/kreatious/pianoleopard/midi/OutputModel.html">OutputModel</a> outputModel) {
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>          <strong class="jxr_keyword">final</strong> JFileChooser chooser = <strong class="jxr_keyword">new</strong> JFileChooser();
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>          chooser.setPreferredSize(<strong class="jxr_keyword">new</strong> Dimension(700, 500));
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>          chooser.setFileFilter(<strong class="jxr_keyword">new</strong> FileFilter() {

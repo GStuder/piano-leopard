@@ -16,9 +16,9 @@
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> javax.sound.midi.MidiMessage;
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> javax.swing.JToggleButton;
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.Event;
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.OutputModel;
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.sequencer.OutputModel.EventAction;
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.OutputModel;
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.OutputModel.EventAction;
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> net.kreatious.pianoleopard.midi.event.Event;
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_javadoccomment"> * Provides the controller for the play along action.</em>
@@ -34,7 +34,7 @@
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <em class="jxr_javadoccomment">     * Constructs a view and associates it with its controller</em>
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>      <strong class="jxr_keyword">static</strong> Component create(<a href="../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">OutputModel</a> outputModel) {
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>      <strong class="jxr_keyword">static</strong> Component create(<a href="../../../net/kreatious/pianoleopard/midi/OutputModel.html">OutputModel</a> outputModel) {
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>          <strong class="jxr_keyword">final</strong> JToggleButton button = <strong class="jxr_keyword">new</strong> JToggleButton(<span class="jxr_string">"Play along"</span>);
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>          <strong class="jxr_keyword">final</strong> <a href="../../../net/kreatious/pianoleopard/PlayAlongController.html">PlayAlongEventHandler</a> eventHandler = <strong class="jxr_keyword">new</strong> <a href="../../../net/kreatious/pianoleopard/PlayAlongController.html">PlayAlongEventHandler</a>();
@@ -51,7 +51,7 @@
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>          <strong class="jxr_keyword">boolean</strong> playAlong;
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>  
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>          @Override
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>          <strong class="jxr_keyword">public</strong> <a href="../../../net/kreatious/pianoleopard/midi/sequencer/OutputModel.html">EventAction</a> apply(MidiMessage message, Optional&lt;Event&gt; event) {
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>          <strong class="jxr_keyword">public</strong> <a href="../../../net/kreatious/pianoleopard/midi/OutputModel.html">EventAction</a> apply(MidiMessage message, Optional&lt;Event&gt; event) {
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>              <strong class="jxr_keyword">if</strong> (!event.isPresent()) {
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>                  <strong class="jxr_keyword">return</strong> EventAction.UNHANDLED;
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>              } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (playAlong) {
