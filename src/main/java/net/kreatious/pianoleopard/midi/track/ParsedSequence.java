@@ -8,12 +8,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 
+import net.kreatious.pianoleopard.midi.event.Event;
+import net.kreatious.pianoleopard.midi.event.EventFactory;
 import net.kreatious.pianoleopard.midi.event.TempoCache;
 
 /**
@@ -160,6 +163,19 @@ public class ParsedSequence {
      * @return a new {@link ParsedSequence}
      */
     public static ParsedSequence parseByTracks(Sequence sequence) {
-        return new ParsedSequence(sequence, sequence.getTracks(), new TempoCache(sequence));
+        if (sequence.getTracks().length != 1) {
+            return new ParsedSequence(sequence, sequence.getTracks(), new TempoCache(sequence));
+        }
+
+        final Track[] tracks = IntStream.range(0, 16).mapToObj(x -> sequence.createTrack()).toArray(Track[]::new);
+        final TempoCache cache = new TempoCache(sequence);
+
+        final Track track = sequence.getTracks()[0];
+        IntStream.range(0, track.size()).mapToObj(track::get).forEachOrdered(note -> {
+            tracks[EventFactory.create(note, cache).map(Event::getChannel).orElse(0)].add(note);
+        });
+        sequence.deleteTrack(track);
+
+        return new ParsedSequence(sequence, tracks, cache);
     }
 }
