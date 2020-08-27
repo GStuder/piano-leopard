@@ -1,16 +1,12 @@
-Piano Leopard
-=============
+# Piano Leopard
 
-What is it?
------------
-
+## What is it?
 Piano Leopard is an easy to use program for learning how to play a synthesizer or piano, by playing along with
 MIDI files. It supports foot pedals as well as lighted keyboards.
 
 ![Preview of Piano Leopard](../master/preview.gif)
 
-Installation
-------------
+## Installation
 Piano Leopard can be [downloaded here](https://repo1.maven.org/maven2/net/kreatious/pianoleopard/pianoleopard/1.1.1/pianoleopard-1.1.1-jar-with-dependencies.jar)
 from Maven Central.
 
@@ -18,8 +14,7 @@ You need [Java 8](http://java.com/en/) if you don't have it already, and an elec
 similar to [this lighted keyboard](http://amzn.com/B005N4N2CQ). I highly recommend lighted keyboards. You will
 also need MIDI files. All major operating systems are supported.
 
-MIDI Files
-----------
+## MIDI Files
 You need MIDI files in order to play Piano Leopard. They can be found by using the search keywords `piano only midi`
 along with a song or artist. They do not have to be piano only. Here are a few of my favorites to get started:
 
